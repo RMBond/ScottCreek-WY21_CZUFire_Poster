@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 
 ## Introduction
-This is a space to keep track of the datasets used in the 2021 SRF poster. The goal is to visualize the "first flush" after the 2020 CZU Fire in the Scott Creek watershed (Santa Cruz, CA). 
+This is a space to keep track of the datasets used in the 2021 SRF poster. The goal is to visualize the "first flush" after the 2020 CZU Fire in the Scott Creek watershed (Santa Cruz, CA). Initially we plan to look at water quality and pebble count data.
 
 <br>
 
@@ -29,14 +29,36 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 1. The <span style="color:purple">*Scott_Creek_Weir_Hydrolab_12302020.csv*</span> datafile contains a snippbet (incomplete dataset) of the water quality data collected by the HYDROLAB (S/N 66279, model DS5X). The unit is installed directly above the weir. It collects depth, temp, salinity, turbidity, (and other) every half hour. 
 
+2. Pebble count data ... <span style="color:red">still need to enter Autumn 2020 and collect and enter Spring 2021 data.</span>
+
+
+## Next Steps
+
+1. The inital WQ data csv file isn't in an easily readable format. We will need to do some formatting in excel (not ideal) to separate the data columns.
+
+2. Collect next round of pebble count data AND do all of the data entry.
+
+## WQ Data
+
+
+```{r WQ Data Wrangling}
+
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(patchwork)
+
+wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_12302020.csv", sep = ",", header = T) #Initial water qualiy test dataset.
+
+
+
+```
+
+
 
 ## Figure Output 
 
 
 The <span style="color:purple">*Figure*</span> folder contains the figures used in the poster.
 
-1. 
-
-## Next Steps
-
-1. Read in WQ data and start some preliminary plots.
+1.
