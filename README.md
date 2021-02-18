@@ -5,6 +5,7 @@ Scott Creek CZU Fire 2021 SRF Poster Notes
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
   - [WQ Data](#wq-data)
+  - [Pebble Counts](#pebble-counts)
   - [Figure Output](#figure-output)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -66,6 +67,16 @@ library(patchwork)
 
 wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_12302020.csv", sep = ",", header = T) #Initial water qualiy test dataset.
 ```
+
+## Pebble Counts
+
+  - Check out this [r package on grain
+    size](https://github.com/dtavern/grainsizeR) Note: it is under
+    development but may be useful for some quick data viz.
+
+  - There are some example papers vizualizing pebble count data in the
+    CZU fire google drive [pebble count
+    folder](https://drive.google.com/drive/u/1/folders/1MwYFVTyhN1_3NMqhlwIAu8DBYOm8KzSo).
 
 ## Figure Output
 

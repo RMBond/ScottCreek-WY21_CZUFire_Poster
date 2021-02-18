@@ -54,7 +54,12 @@ wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_12302020.csv", sep = ",", hea
 
 ```
 
+## Pebble Counts 
 
+
+* Check out this [r package on grain size](https://github.com/dtavern/grainsizeR) Note: it is under development but may be useful for some quick data viz.
+
+* There are some example papers vizualizing pebble count data in the CZU fire google drive [pebble count folder](https://drive.google.com/drive/u/1/folders/1MwYFVTyhN1_3NMqhlwIAu8DBYOm8KzSo).
 
 ## Figure Output 
 
