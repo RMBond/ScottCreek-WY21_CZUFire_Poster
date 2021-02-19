@@ -29,14 +29,18 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 1. The <span style="color:purple">*Scott_Creek_Weir_Hydrolab_12302020.csv*</span> datafile contains a snippbet (incomplete dataset) of the water quality data collected by the HYDROLAB (S/N 66279, model DS5X). The unit is installed directly above the weir. It collects depth, temp, salinity, turbidity, (and other) every half hour. 
 
-2. Pebble count data ... <span style="color:red">still need to enter Autumn 2020 and collect and enter Spring 2021 data.</span>
+2. 
+
+3. Pebble count data ... <span style="color:red">still need to enter Autumn 2020 and collect and enter Spring 2021 data.</span>
 
 
 ## Next Steps
 
 1. The inital WQ data csv file isn't in an easily readable format. We will need to do some formatting in excel (not ideal) to separate the data columns.
 
-2. Collect next round of pebble count data AND do all of the data entry.
+2. Plot Hydrograph.
+
+3. Collect next round of pebble count data AND do all of the data entry.
 
 ## WQ Data
 
@@ -53,6 +57,43 @@ wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_12302020.csv", sep = ",", hea
 
 
 ```
+
+
+## Hydrograph
+```{r Hydrograph Data Wrangling}
+library(lubridate)
+library(ggplot2)
+library(scales)
+library(gridExtra)
+library(dplyr)
+options(scipen = 999)
+
+#Bring in datasets
+gage.dat <- read.csv("data/Gagedata_20210218.csv",h = T,na.strings = c("","NA","#N/A"))#Flows up to 30 January 2021
+
+#Clean up hydrograph data
+gage <- gage.dat
+  mutate(DT = XXX(timestamp)) %>% # clean up time data
+  select(DT,Q) %>% 
+  mutate(stage_m = stage_ft*0.3048) #Convert from CFS to CMS
+
+str(q2)
+
+####Hydrograph ####
+#Plot 1 - basic plot
+ggplot(q2,aes(RoundTS,q_cms)) +
+  geom_line() +
+  scale_x_datetime(limits = c(as.POSIXct("2014-10-01"),as.POSIXct("2017-10-01")),name = "",
+                   date_breaks = "4 month", date_labels = ("%b %y")) +
+  scale_y_continuous(name = expression(Discharge~ "["*m^3*s^-1*"]")) +  ###Need to change notation
+  theme(axis.text.x = element_blank(),axis.ticks.x = element_blank(),
+        axis.text.y = element_text(size = 12),axis.title.y = element_text(size = 14)) +
+  geom_hline(yintercept = 30,col = "grey75") + #assumbing 1000 cfs is bankfull
+  scale_fill_grey() +
+  theme_bw() +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) 
+```
+
 
 ## Pebble Counts 
 
