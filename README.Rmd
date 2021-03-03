@@ -27,34 +27,125 @@ This is a space to keep track of the datasets used in the 2021 SRF poster. The g
 
 The <span style="color:purple">*Data*</span> folder contains the datasets used in the poster.
 
-1. The <span style="color:purple">*Scott_Creek_Weir_Hydrolab_12302020.csv*</span> datafile contains a snippbet (incomplete dataset) of the water quality data collected by the HYDROLAB (S/N 66279, model DS5X). The unit is installed directly above the weir. It collects depth, temp, salinity, turbidity, (and other) every half hour. This file be updated as new downloads are completed up untill the time of the poster.
+1. The <span style="color:purple">*Scott_Creek_Weir_Hydrolab_20210303.csv*</span> datafile contains a snippbet (incomplete dataset) of the water quality data collected by the HYDROLAB (S/N 66279, model DS5X). The unit is installed directly above the weir. It collects depth, temp, salinity, turbidity, (and other) every half hour. This file be updated as new downloads are completed up untill the time of the poster. Note there is some column renaming done before importing the dataset into r.
 
-2. The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek consluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. This file be updated as new downloads are completed up untill the time of the poster.
+2. The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek consluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. Unfortunately this file is missing WY20 data
 
 3. Pebble count data ... <span style="color:red">still need to enter Autumn 2020 and collect and enter Spring 2021 data.</span>
 
 
 ## Next Steps
 
-1. The inital WQ data csv file isn't in an easily readable format. We will need to do some formatting in excel (not ideal) to separate the data columns (likely use space insted of comma).
+1. Continue to update WQ data csv file as needed.
 
-2. Plot Hydrograph - Missing data between 12/4/19 and 12/4/20 (SP emailed about issue)!! RB will work on this.
+2. Plot Hydrograph - Missing data between 12/4/19 and 12/4/20 (SP emailed about issue)!! RB is working on this. It's likely we will not be presenting this data and will use the pressure data in the WQ dataset as a proxy.
 
-3. Collect next round of pebble count data (scheduled 2/24/21) AND enter data from both rounds into spreadsheet. AC and MA can help with this.
+3. Enter data from both rounds of pebble counts into spreadsheet. AC and MA can help with this.
 
-## WQ Data
-
-
-```{r WQ Data Wrangling}
-
+```{r, Package Setup, echo = FALSE, message = FALSE}
 library(dplyr)
 library(lubridate)
 library(ggplot2)
 library(patchwork)
 
-wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_12302020.csv", sep = ",", header = T) #Initial water qualiy test dataset.
+```
 
 
+
+## WQ Data
+
+```{r WQ Data Wrangling, echo = FALSE}
+
+wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_20210303.csv", sep = ",", header = T) #Initial water qualiy test dataset.
+
+wq <- wq.dat %>% #Start formatting columns into r structure
+  mutate(Date = mdy(Date)) %>% #R sees dates as Year-Month-Day this tells it where to get that info from the date column.
+  mutate(Time = hms(Time)) %>% # Tells r this column is Hours:Min:Sec
+  mutate(TS = as.POSIXct(Date + Time)) %>% #making a new column with timestamp by combining Date and Time
+  select(Date, TS, Temp_C, TurbSC_NTU, Dep100_m, pH, Sal_ppt, LDO_mg_l)#pair down dataset to what we need
+
+```
+Dataset name = wq
+
+Variable (column) description:
+
+* Date = date 
+* TS = Timestamp
+* Temp_C = Water Temperature [*C]
+* TurbSC_NTU = Turbidity [NTU]
+* Dep100_m =  Water depth (think height of water column) [m]
+* pH = pH
+* Sal_ppt = Salinity [parts per thousand] 
+* LDO_mg_l = Dissolved Oxygen [mg/L]
+
+```{r}
+str(wq)
+```
+
+```{r, WQ Plotting, echo = FALSE, message = FALSE, warning = FALSE}
+
+#Set data limits
+limits = as.POSIXct(c("2021-01-01 00:00:00", "2021-03-01 00:00:00"))
+
+#Start making plots
+#Water depth
+depth.plot <- ggplot(wq, aes(x = TS, y = Dep100_m)) +
+  geom_line() +
+  scale_x_datetime(name = "",
+                   date_breaks = "1 week", date_labels = ("%b %d"),
+                   limits = limits, expand = c(0,0)) +
+  scale_y_continuous(name = "Height [m]", limits = c(1.5, 3.5)) +
+theme_classic()
+
+#Turbidity
+turb.plot <- ggplot(wq, aes(x = TS, y = TurbSC_NTU)) +
+  geom_line() +
+  scale_x_datetime(name = "",
+                   date_breaks = "1 week", date_labels = ("%b %d"),
+                   limits = limits, expand = c(0,0)) +
+  scale_y_continuous(name = "Turbidity [NTU]", limits = c(0, 3000)) +
+theme_classic()
+
+#pH
+pH.plot <- ggplot(wq, aes(x = TS, y = pH)) +
+  geom_line() +
+  scale_x_datetime(name = "",
+                   date_breaks = "1 week", date_labels = ("%b %d"),
+                   limits = limits, expand = c(0,0)) +
+  scale_y_continuous(name = "pH", limits = c(7, 8)) +
+theme_classic()
+
+#DO
+do.plot <- ggplot(wq, aes(x = TS, y = LDO_mg_l)) +
+  geom_line() +
+  scale_x_datetime(name = "",
+                   date_breaks = "1 week", date_labels = ("%b %d"),
+                   limits = limits, expand = c(0,0)) +
+  scale_y_continuous(name = "DO [mg/L]", limits = c(8.5, 12.1)) +
+theme_classic()
+
+#Temperature
+temp.plot <- ggplot(wq, aes(x = TS, y = Temp_C)) +
+  geom_line() +
+  scale_x_datetime(name = "",
+                   date_breaks = "1 week", date_labels = ("%b %d"),
+                   limits = limits, expand = c(0,0)) +
+  scale_y_continuous(name = "Temperature [*C]", limits = c(6.5, 25.5)) +
+theme_classic()
+
+
+# #Salinity - not much to see since its freshwater the whole time.
+# sal.plot <- ggplot(wq, aes(x = TS, y = Sal_ppt)) +
+#   geom_line() +
+#   scale_x_datetime(name = "",
+#                    date_breaks = "1 week", date_labels = ("%b %d"),
+#                    limits = limits, expand = c(0,0)) +
+#   scale_y_continuous(name = "Salinity [ppt]", limits = c(8.5, 12.1)) +
+# theme_classic()
+
+
+#Using Patchwork pckage to put individual plots together into one multi-plot
+depth.plot / turb.plot / pH.plot / do.plot / temp.plot
 
 ```
 
