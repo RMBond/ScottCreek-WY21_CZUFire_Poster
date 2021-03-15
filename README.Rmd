@@ -11,8 +11,7 @@ output:
 ```{r, echo = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  fig.path = "readme-figs/"
+  comment = "#>"
 )
 ```
 
@@ -29,18 +28,18 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 1. The <span style="color:purple">*Scott_Creek_Weir_Hydrolab_20210303.csv*</span> datafile contains a snippbet (incomplete dataset) of the water quality data collected by the HYDROLAB (S/N 66279, model DS5X). The unit is installed directly above the weir. It collects depth, temp, salinity, turbidity, (and other) every half hour. This file be updated as new downloads are completed up untill the time of the poster. Note there is some column renaming done before importing the dataset into r.
 
-2. The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek consluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. Unfortunately this file is missing WY20 data
+2. The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek consluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. <span style="color:red">Unfortunately this file is missing WY20 data (specifically data between 12/4/19 and 12/4/20)and it's likely we will not be presenting this data. We can use the pressure data in the WQ dataset as a proxy.</span>
 
-3. Pebble count data ... <span style="color:red">still need to enter Autumn 2020 and collect and enter Spring 2021 data.</span>
+3. The <span style="color:purple">*Scott_Creek_Pebble_XXX.csv*</span> datafile consists of two round sof pebblecounts at 23 transects accrost the watershed. AC and MA entered and QC'ed the data. 
 
 
 ## Next Steps
 
 1. Continue to update WQ data csv file as needed.
 
-2. Plot Hydrograph - Missing data between 12/4/19 and 12/4/20 (SP emailed about issue)!! RB is working on this. It's likely we will not be presenting this data and will use the pressure data in the WQ dataset as a proxy.
+2. AC and MA are entering the data from both rounds of pebble counts into spreadsheet.
 
-3. Enter data from both rounds of pebble counts into spreadsheet. AC and MA can help with this.
+3. RB is making pebble count summary and plotting code.
 
 ```{r, Package Setup, echo = FALSE, message = FALSE}
 library(dplyr)
@@ -54,11 +53,13 @@ library(patchwork)
 
 ## WQ Data
 
+Goal: Visualize WQ time-series during the "first flush". 
+
 ```{r WQ Data Wrangling, echo = FALSE}
 
 wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_20210303.csv", sep = ",", header = T) #Initial water qualiy test dataset.
 
-wq <- wq.dat %>% #Start formatting columns into r structure
+wq <- wq.dat %>% #Start formatting columns into r "tidy" structure.
   mutate(Date = mdy(Date)) %>% #R sees dates as Year-Month-Day this tells it where to get that info from the date column.
   mutate(Time = hms(Time)) %>% # Tells r this column is Hours:Min:Sec
   mutate(TS = as.POSIXct(Date + Time)) %>% #making a new column with timestamp by combining Date and Time
@@ -151,19 +152,22 @@ depth.plot / turb.plot / pH.plot / do.plot / temp.plot
 
 
 ## Hydrograph
+
+Goal: Visualize Hydrograph time-series during the "first flush". Note this data will *not* be presented in the poster.
+
 ```{r Hydrograph Data Wrangling}
-library(lubridate)
-library(ggplot2)
-library(scales)
-library(gridExtra)
-library(dplyr)
-options(scipen = 999)
+# library(lubridate)
+# library(ggplot2)
+# library(scales)
+# library(gridExtra)
+# library(dplyr)
+# options(scipen = 999)
 
 # #Bring in datasets
 # gage.dat <- read.csv("data/Gagedata_XXX.csv", h = T)#Flows up to 30 January 2021 6891 obs of 2 var.
 # 
 # #Clean up hydrograph data
-# gage <- gage.dat %>% 
+# gage <- gage.dat %>% #Start formatting columns into r "tidy" structure.
 #   mutate(DT = mdy_hm(as.character(timestamp))) %>% # clean up time data
 #   mutate(stage_m = stage_ft*0.3048) %>% #Convert from ft to m
 #   select(DT, stage_m)
@@ -183,10 +187,100 @@ options(scipen = 999)
 
 ## Pebble Counts 
 
-
-* Check out this [r package on grain size](https://github.com/dtavern/grainsizeR) Note: it is under development but may be useful for some quick data viz.
+Goal: 1. Compair how different surface summary statistics (i.e. Dx) changed after the “first flush” at 1.a each site and 1.b longitudinally along the mainstem and 
+2. estimate the change in the amount of surface fines at each transect (reported as % change over time).
 
 * There are some example papers vizualizing pebble count data in the CZU fire google drive [pebble count folder](https://drive.google.com/drive/u/1/folders/1MwYFVTyhN1_3NMqhlwIAu8DBYOm8KzSo).
+
+
+```{r Pebble Count Data Wrangling, echo = FALSE}
+
+pc.dat <- read.csv("Data/Scott_Creek_Pebble_Testdata_20210315.csv", sep = ",", header = T) #Initial pebble count test dataset.
+
+pc <- pc.dat %>% #Start formatting columns into r "tidy" structure.
+  mutate(Date = mdy(Date)) %>% 
+  mutate(Long_Station = as.numeric(Long_Station)) %>% #change column to type = numeric.
+  mutate(Category_total = as.numeric(Category_total)) %>% #change column to type = numeric.
+  arrange(Size_class_mm) %>% #makes sure data goes from smallest to larges pebble sizes.
+  mutate(Percent_finer = cumsum(Category_total)/sum(Category_total)) #creat column for percent finer than. 
+
+```
+
+Dataset name = pc
+
+Variable (column) description:
+
+* Date = Sample date (format = YYYY-MM-DD).
+
+* Site = Site name (“___ eFishing” or “PCX-__”).
+
+* Transect = Transect number (1,2,3 for eFishing sites or blank for PCX sites).
+
+* Round = Survey round (1 = Autumn 2020, 2 = Winter 2021).
+
+* Long_Station = Longitude Station (1 = Lower eFishing, 2 = PCX-1, 3 = PCX-2, 4 = PCX-4, 5 = PCX-5, 6 = Upper eFishing, 7 = Dog eFishing, 8 = PCX-3, 9 = Big Creek eFishing, 10 = Powerhouse eFishing, 11 = Little Creek eFishing).
+
+* Size_class_mm = Size class (mm), gevelometer hole the pebble *did not* fit though.
+
+* Category_total = Total number of pebbles in the size class.
+
+* Percent_finer = Cumulative percent finer for each size class. This is used for calculating the Dx statistic. 
+
+```{r}
+str(pc)
+```
+#Find gransize at percentiles
+
+Colin Nicol has generously shared his code (from previous work we did together). Create a function which interpolates a straight line between the two points nearest to the desired percentile `Dx`. Using the data provided, the function looks for the minimum grain size where the percent finer is greater than `Dx`. Then it calculates the slope between those two lines. From here, it uses the slope and the `rise` to get to 50% to calculate a `run` (distance on the x-axis `grain size` we need to move from the known point to `D50`).   
+
+```{r Pebble Count Summary Stats (Dx)}
+
+
+#Pebble Count Summary Stat code from C. Nicol :)
+
+calculate_dx <- function(dx, size, prcnt_finer) {
+  # Purpose: Calculate the grainsize for a given percentile
+  # Method: Interpolate a straight line between the two bounding points
+  # Input:  df - Dataframe with percent finer than data, dx - desired output percentile
+  
+  # Output: Grainsize at dx
+  
+  dx <- dx/100
+  
+  data.frame(size = size, prcnt_finer = prcnt_finer) %>%
+    mutate(abovex = min(size[prcnt_finer > dx]),
+           lessx = max(size[prcnt_finer <= dx])) %>%
+    filter(size %in% c(abovex, lessx)) %>%
+    mutate(slope = (max(prcnt_finer) - min(prcnt_finer)) / (max(size) - min(size))) %>%
+    filter(size == lessx) %>%
+    mutate(run = (dx - prcnt_finer) / slope,
+           dx_size = size + run,
+           dx = dx * 100) %>%
+    pull(dx_size)
+  
+}
+
+#Call in what you want to calculate. In this case its the median grain size (D50) of the test dataset. 
+
+calculate_dx(50, pc$Size_class_mm, pc$Percent_finer)
+
+#Note, it will give you an error if the first category (i.e. <2mm) is greater than the percential you want to calculate.
+
+calculate_dx(16, pc$Size_class_mm, pc$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
+
+#Once we have this function set up, loop through D16, D50 and D84.
+dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
+
+names(dxs) <- paste0('d', dxs)
+
+sapply(dxs, calculate_dx, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer) 
+
+
+
+```
+
+
+
 
 ## Figure Output 
 
