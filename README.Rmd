@@ -198,15 +198,32 @@ Goals:
 
 ```{r Pebble Count Data Wrangling, echo = FALSE}
 
-pc.dat <- read.csv("Data/Scott_Creek_Pebble_Testdata_20210315.csv", sep = ",", header = T) #Initial pebble count test dataset.
+#Test Data
+pc.dat.test <- read.csv("Data/Scott_Creek_Pebble_Testdata_20210315.csv", sep = ",", header = T) #Initial pebble count test dataset.
 
-pc <- pc.dat %>% #Start formatting columns into r "tidy" structure.
+pc.test <- pc.dat.test %>% #Start formatting columns into r "tidy" structure.
   mutate(Date = mdy(Date)) %>% 
   mutate(Round = as.factor(Round)) %>% #change column to type = factor
   mutate(Long_Station = as.numeric(Long_Station)) %>% #change column to type = numeric.
   mutate(Category_total = as.numeric(Category_total)) %>% #change column to type = numeric.
   arrange(Size_class_mm) %>% #makes sure data goes from smallest to larges pebble sizes.
+  mutate(Percent_finer = cumsum(Category_total)/sum(Category_total)) #creat column for percent finer than.
+
+
+
+#Real Data
+pc.dat <- read.csv("Data/Scott_Creek_Pebble_20210319.csv", sep = ",", header = T) #736 obs of 7 var.
+
+pc <- pc.dat %>% #Start formatting columns into r "tidy" structure.
+  mutate(Date = ymd(Date)) %>% 
+  mutate(Round = as.factor(Round)) %>% #change column to type = factor
+  mutate(Long_Station = as.numeric(Long_Station)) %>% #change column to type = numeric.
+  mutate(Category_total = as.numeric(Category_total)) %>% #change column to type = numeric.
+  mutate(Transect = replace_na(Transect, 0)) %>% #replace na (for PCX transects) with a zero 
+  group_by(Round, Site, Transect) %>% #Tells r to group each individual transect worth of data to calculate % finer.
+  arrange(Size_class_mm) %>% #makes sure data goes from smallest to larges pebble sizes.
   mutate(Percent_finer = cumsum(Category_total)/sum(Category_total)) #creat column for percent finer than. 
+
 
 ```
 
@@ -237,8 +254,15 @@ str(pc)
 
 ```{r}
 
-#A quick plot of the test data
-ggplot(pc, aes(Size_class_mm, Percent_finer, color = Round)) +
+#A quick plot of one transect
+
+#Make a test dataset using Big Creek Transect 3 with color noting each round.
+test.bc3 <- pc %>% 
+  filter(Site == "Big Creek eFishing",
+         Transect == 3) #32 obs of 8 var
+
+#Plot
+ggplot(test.bc3, aes(Size_class_mm, Percent_finer, color = Round)) +
   geom_line() +
   scale_x_log10(name = "Partical size [mm]") +
   scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1))
@@ -278,28 +302,28 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 #Call in what you want to calculate. In this case its the median grain size (D50) of the test dataset (one site). 
 
-calculate_dx(50, pc$Size_class_mm, pc$Percent_finer)
+calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
 
 #Note, it will give you an error if the first category (i.e. <2mm) is greater than the percential you want to calculate.
 
-calculate_dx(16, pc$Size_class_mm, pc$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
+# calculate_dx(16, pc.test$Size_class_mm, pc.test$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
 
 #Once we have this function set up, loop through D16, D50 and D84 for the one site.
-dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
-
-names(dxs) <- paste0('d', dxs)
-
-sapply(dxs, calculate_dx, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer) 
+# dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
+# 
+# names(dxs) <- paste0('d', dxs)
+# 
+# sapply(dxs, calculate_dx, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer) 
 
 
 
 # Calculate summary stats for multiple transects all at once
-
-pc2 <- pc %>% 
-  group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
-  summarize(
-    d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
-    d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
+#NOT WORKING 
+# pc2 <- pc %>% 
+#   group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
+#   summarize(
+#     d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
+#     d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
 
 ```
 
@@ -310,34 +334,114 @@ Start by summarising the % fines at each transect and then subtract round 1 from
 
 #Subset data by Round
 pc3.r1 <- pc %>% 
-  filter(Size_class_mm == 5.6) %>% #focus on the 5.6 size class for each transect
-  filter(Round = 1) #Round 1 data
+  filter(Round == 1) %>% #Round 1 data
+  filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+
 
 pc3.r2 <- pc %>% 
-  filter(Size_class_mm == 5.6) %>% #focus on the 5.6 size class for each transect
-  filter(Round = 1) #Round 2 data
+filter(Round == 2) %>% #Round 2 data
+  filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
 
 #Spread data into long format to calculate % change
-pc3 <- full_join(pc3.r1, pc3.r2) %>% #Joins the two rounds of data
+pc3 <- full_join(pc3.r1, pc3.r2, by = c("Site", "Transect")) %>% #Joins the two rounds of data
   mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
+  mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
   select(Site, Transect, Long_Station, fines_per_change)
 
 #Plot % fines change over longitudinal station distance
 
 #Subset data by mainstem vs tributary
 pc3.mainstem <- pc3 %>% 
-  filter(Long_Station < 8)
+  filter(Long_Station < 8) %>% 
+  filter(Transect == 0 | Transect == 2)
 
 pc3.bigcreek <- pc3 %>% 
-  filter(Long_Station > 7 & Long_Station < 11)
+  filter(Long_Station > 7 & Long_Station < 11) %>% 
+  filter(Transect == 0 | Transect == 2)
 
 pc3.littlecreek <- pc3 %>% 
-  filter(Long_Station == 11)
+  filter(Long_Station == 11) %>% 
+  filter(Transect == 0 | Transect == 2)
 
+#Subset efishing reaches to make ranges for plot
+lmef <- pc3 %>% 
+  filter(Long_Station == 7)
 
+#Mainstem plot
+
+ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
+  geom_line() +
+  scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+  scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+  theme_classic() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
+  geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
+  geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
+  labs(title = "Change in percent fines (<6mm) along the mainstem", 
+       subtitle = "Flow is from right (Upstream) to left (Downstream)",
+       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. Dotted vertical lines are ranges at the eFishing sites.")
+  
 
 
 ```
+
+#Repeat above code with 8mm cutoff
+```{r Caculate change in % fines (<=8mm) for each transect}
+#Subset data by Round
+pc3.r1.8 <- pc %>%
+  filter(Round == 1) %>% #Round 1 data
+  filter(Size_class_mm == 8) #focus on the 8 size class for each transect
+
+
+pc3.r2.8 <- pc %>%
+filter(Round == 2) %>% #Round 2 data
+  filter(Size_class_mm == 8) #focus on the 8 size class for each transect
+
+#Spread data into long format to calculate % change
+pc3.8 <- full_join(pc3.r1.8, pc3.r2.8, by = c("Site", "Transect")) %>% #Joins the two rounds of data
+  mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
+  mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
+  select(Site, Transect, Long_Station, fines_per_change)
+
+#Plot % fines change over longitudinal station distance
+
+#Subset data by mainstem vs tributary
+pc3.8.mainstem <- pc3.8 %>%
+  filter(Long_Station < 8) %>%
+  filter(Transect == 0 | Transect == 2)
+
+pc3.8.bigcreek <- pc3.8 %>%
+  filter(Long_Station > 7 & Long_Station < 11) %>%
+  filter(Transect == 0 | Transect == 2)
+
+pc3.8.littlecreek <- pc3.8 %>%
+  filter(Long_Station == 11) %>%
+  filter(Transect == 0 | Transect == 2)
+
+#Subset efishing reaches to make ranges for plot
+lmef <- pc3.8 %>%
+  filter(Long_Station == 7)
+
+#Mainstem plot
+
+ggplot(pc3.8.mainstem, aes(x = Long_Station, y = fines_per_change)) +
+  geom_line() +
+  scale_y_continuous(name = "Percent Change (<8mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+  scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+  theme_classic() +
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_segment(x = 1, y = -0.12, xend = 1, yend = 0.09, lty = 3) + #variation in Station 1
+  geom_segment(x = 6, y = 0.11, xend = 6, yend = 0.29, lty = 3) + #variation in Station 6
+  geom_segment(x = 7, y = -0.1, xend = 7, yend = 0.43, lty = 3) + #variation in Station 7
+  labs(title = "Change in percent fines (<8mm) along the mainstem",
+       subtitle = "Flow is from right (Upstream) to left (Downstream)",
+       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. Dotted vertical lines are ranges at the eFishing sites.")
+
+
+```
+
+
 
 
 
