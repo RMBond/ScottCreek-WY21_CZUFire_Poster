@@ -30,18 +30,17 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 2. The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek consluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. <span style="color:red">Unfortunately this file is missing WY20 data (specifically data between 12/4/19 and 12/4/20)and it's likely we will not be presenting this data. We can use the pressure data in the WQ dataset as a proxy.</span>
 
-3. The <span style="color:purple">*Scott_Creek_Pebble_XXX.csv*</span> datafile consists of pebble counts at 23 transects accrost the watershed (6 eFishing sites with 3 transects each, and 5 additional pebble count only transects) which were repeated twice (Autumn 2020 & Winter 2021). AC and MA entered and QC'ed the data. 
+3. The <span style="color:purple">*Scott_Creek_Pebble_20210319.csv*</span> datafile consists of pebble counts at 23 transects accrost the watershed (6 eFishing sites with 3 transects each, and 5 additional pebble count only transects) which were repeated twice (Autumn 2020 & Winter 2021). AC and MA entered and QC'ed the data. 
 
 
 ## Next Steps
 
 1. Decide on which WQ parameters to present and continue to update WQ data csv file as needed. 
 
-2. AC and MA are entering the data from both rounds of pebble counts into spreadsheet.
-
-3. RB is working on code for making pebble count summaries and potential plotting.
+2. RB is working on code for making pebble count summaries and potential plotting.
 
 ```{r, Package Setup, echo = FALSE, message = FALSE}
+library(tidyverse)
 library(dplyr)
 library(lubridate)
 library(ggplot2)
@@ -199,7 +198,7 @@ Goals:
 ```{r Pebble Count Data Wrangling, echo = FALSE}
 
 #Test Data
-pc.dat.test <- read.csv("Data/Scott_Creek_Pebble_Testdata_20210315.csv", sep = ",", header = T) #Initial pebble count test dataset.
+pc.dat.test <- read.csv("Data/Scott_Creek_Pebble_Testdata_20210315.csv", sep = ",", header = T) #Initial pebble count test dataset. It consists of one transects worth of data.
 
 pc.test <- pc.dat.test %>% #Start formatting columns into r "tidy" structure.
   mutate(Date = mdy(Date)) %>% 
@@ -211,7 +210,7 @@ pc.test <- pc.dat.test %>% #Start formatting columns into r "tidy" structure.
 
 
 
-#Real Data
+#Real (whole) Data
 pc.dat <- read.csv("Data/Scott_Creek_Pebble_20210319.csv", sep = ",", header = T) #736 obs of 7 var.
 
 pc <- pc.dat %>% #Start formatting columns into r "tidy" structure.
@@ -257,15 +256,16 @@ str(pc)
 #A quick plot of one transect
 
 #Make a test dataset using Big Creek Transect 3 with color noting each round.
-test.bc3 <- pc %>% 
-  filter(Site == "Big Creek eFishing",
-         Transect == 3) #32 obs of 8 var
+test.bc <- pc %>% 
+  filter(Site == "Big Creek eFishing")
 
 #Plot
-ggplot(test.bc3, aes(Size_class_mm, Percent_finer, color = Round)) +
+ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
   geom_line() +
+  facet_grid(Transect ~ .) +
   scale_x_log10(name = "Partical size [mm]") +
-  scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1))
+  scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1)) +
+  theme_classic()
 ```
 
 
@@ -319,7 +319,7 @@ calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
 
 # Calculate summary stats for multiple transects all at once
 #NOT WORKING 
-# pc2 <- pc %>% 
+# pc2 <- pc %>%
 #   group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
 #   summarize(
 #     d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
@@ -328,7 +328,7 @@ calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
 ```
 
 # Caculate change in % fines (<6mm) for each transect 
-Start by summarising the % fines at each transect and then subtract round 1 from round 2.
+Start by summarising the % fines at each transect and then subtract round 1 from round 2. Poitive numbers mean the channel bed has gotten finer and negative numbers mean the bed has gotten more course.
 
 ```{r Caculate change in % fines (<6mm) for each transect}
 
@@ -350,7 +350,7 @@ pc3 <- full_join(pc3.r1, pc3.r2, by = c("Site", "Transect")) %>% #Joins the two 
 
 #Plot % fines change over longitudinal station distance
 
-#Subset data by mainstem vs tributary
+#Subset data by mainstem vs tributary stations (See above for station number key)
 pc3.mainstem <- pc3 %>% 
   filter(Long_Station < 8) %>% 
   filter(Transect == 0 | Transect == 2)
@@ -364,7 +364,7 @@ pc3.littlecreek <- pc3 %>%
   filter(Transect == 0 | Transect == 2)
 
 #Subset efishing reaches to make ranges for plot
-lmef <- pc3 %>% 
+stattest <- pc3 %>% 
   filter(Long_Station == 7)
 
 #Mainstem plot
@@ -380,69 +380,11 @@ ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
   geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
   labs(title = "Change in percent fines (<6mm) along the mainstem", 
        subtitle = "Flow is from right (Upstream) to left (Downstream)",
-       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. Dotted vertical lines are ranges at the eFishing sites.")
+       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
   
 
 
 ```
-
-#Repeat above code with 8mm cutoff
-```{r Caculate change in % fines (<=8mm) for each transect}
-#Subset data by Round
-pc3.r1.8 <- pc %>%
-  filter(Round == 1) %>% #Round 1 data
-  filter(Size_class_mm == 8) #focus on the 8 size class for each transect
-
-
-pc3.r2.8 <- pc %>%
-filter(Round == 2) %>% #Round 2 data
-  filter(Size_class_mm == 8) #focus on the 8 size class for each transect
-
-#Spread data into long format to calculate % change
-pc3.8 <- full_join(pc3.r1.8, pc3.r2.8, by = c("Site", "Transect")) %>% #Joins the two rounds of data
-  mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
-  mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
-  select(Site, Transect, Long_Station, fines_per_change)
-
-#Plot % fines change over longitudinal station distance
-
-#Subset data by mainstem vs tributary
-pc3.8.mainstem <- pc3.8 %>%
-  filter(Long_Station < 8) %>%
-  filter(Transect == 0 | Transect == 2)
-
-pc3.8.bigcreek <- pc3.8 %>%
-  filter(Long_Station > 7 & Long_Station < 11) %>%
-  filter(Transect == 0 | Transect == 2)
-
-pc3.8.littlecreek <- pc3.8 %>%
-  filter(Long_Station == 11) %>%
-  filter(Transect == 0 | Transect == 2)
-
-#Subset efishing reaches to make ranges for plot
-lmef <- pc3.8 %>%
-  filter(Long_Station == 7)
-
-#Mainstem plot
-
-ggplot(pc3.8.mainstem, aes(x = Long_Station, y = fines_per_change)) +
-  geom_line() +
-  scale_y_continuous(name = "Percent Change (<8mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
-  scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
-  theme_classic() +
-  geom_hline(yintercept = 0, lty = 2) +
-  geom_segment(x = 1, y = -0.12, xend = 1, yend = 0.09, lty = 3) + #variation in Station 1
-  geom_segment(x = 6, y = 0.11, xend = 6, yend = 0.29, lty = 3) + #variation in Station 6
-  geom_segment(x = 7, y = -0.1, xend = 7, yend = 0.43, lty = 3) + #variation in Station 7
-  labs(title = "Change in percent fines (<8mm) along the mainstem",
-       subtitle = "Flow is from right (Upstream) to left (Downstream)",
-       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. Dotted vertical lines are ranges at the eFishing sites.")
-
-
-```
-
-
-
 
 
 ## Figure Output 
