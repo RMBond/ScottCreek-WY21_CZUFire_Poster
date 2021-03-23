@@ -270,7 +270,7 @@ ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
 
 
 
-#Find gransize at percentiles
+**Find gransize at percentiles**
 
 Colin Nicol has generously shared his code to help with this. He created a function which interpolates a straight line between the two points nearest to the desired percentile `Dx`. Using the data provided, the function looks for the minimum grain size where the percent finer is greater than `Dx`. Then it calculates the slope between those two lines. From here, it uses the slope and the `rise` to get to 50% to calculate a `run` (distance on the x-axis `grain size` we need to move from the known point to `D50`).   
 
@@ -309,25 +309,35 @@ calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
 # calculate_dx(16, pc.test$Size_class_mm, pc.test$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
 
 #Once we have this function set up, loop through D16, D50 and D84 for the one site.
-# dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
-# 
-# names(dxs) <- paste0('d', dxs)
-# 
-# sapply(dxs, calculate_dx, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer) 
+dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
+
+names(dxs) <- paste0('d', dxs)
+
+sapply(dxs, calculate_dx, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer)
 
 
 
 # Calculate summary stats for multiple transects all at once
-#NOT WORKING 
-# pc2 <- pc %>%
-#   group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
-#   summarize(
-#     d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
-#     d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
+#Test dataset
+pc2.test <- pc.test %>%
+  summarize(
+    d50 = calculate_dx(50, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
+    d84 = calculate_dx(84, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer))
+
+####START HERE####
+#NOT WORKING FOR THE WHOLE DATASET!
+####
+
+pc2 <- pc %>%
+  # group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
+  summarize(
+            # d16 = calculate_dx(16, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
+    d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
+    d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
 
 ```
 
-# Caculate change in % fines (<6mm) for each transect 
+**Caculate change in % fines (<6mm) for each transect**
 Start by summarising the % fines at each transect and then subtract round 1 from round 2. Poitive numbers mean the channel bed has gotten finer and negative numbers mean the bed has gotten more course.
 
 ```{r Caculate change in % fines (<6mm) for each transect}
@@ -369,18 +379,18 @@ stattest <- pc3 %>%
 
 #Mainstem plot
 
-ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
-  geom_line() +
-  scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
-  scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
-  theme_classic() +
-  geom_hline(yintercept = 0, lty = 2) +
-  geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
-  geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
-  geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
-  labs(title = "Change in percent fines (<6mm) along the mainstem", 
-       subtitle = "Flow is from right (Upstream) to left (Downstream)",
-       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
+# ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
+#   geom_line() +
+  # scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+  # scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+  # theme_classic()
+#   geom_hline(yintercept = 0, lty = 2) +
+#   geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
+#   geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
+#   geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
+#   labs(title = "Change in percent fines (<6mm) along the mainstem", 
+#        subtitle = "Flow is from right (Upstream) to left (Downstream)",
+#        caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
   
 
 

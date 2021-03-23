@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-15 March, 2021
+22 March, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -46,18 +46,19 @@ datasets used in the poster.
     can use the pressure data in the WQ dataset as a proxy.</span>
 
 3.  The
-    <span style="color:purple">*Scott\_Creek\_Pebble\_XXX.csv*</span>
-    datafile consists of two round sof pebblecounts at 23 transects
-    accrost the watershed. AC and MA entered and QC’ed the data.
+    <span style="color:purple">*Scott\_Creek\_Pebble\_20210319.csv*</span>
+    datafile consists of pebble counts at 23 transects accrost the
+    watershed (6 eFishing sites with 3 transects each, and 5 additional
+    pebble count only transects) which were repeated twice (Autumn 2020
+    & Winter 2021). AC and MA entered and QC’ed the data.
 
 ## Next Steps
 
-1.  Continue to update WQ data csv file as needed.
+1.  Decide on which WQ parameters to present and continue to update WQ
+    data csv file as needed.
 
-2.  AC and MA are entering the data from both rounds of pebble counts
-    into spreadsheet.
-
-3.  RB is making pebble count summary and plotting code.
+2.  RB is working on code for making pebble count summaries and
+    potential plotting.
 
 ## WQ Data
 
@@ -129,10 +130,18 @@ this data will *not* be presented in the poster.
 
 ## Pebble Counts
 
-Goal: 1. Compair how different surface summary statistics (i.e. Dx)
-changed after the “first flush” at 1.a each site and 1.b longitudinally
-along the mainstem and 2. estimate the change in the amount of surface
-fines at each transect (reported as % change over time).
+Goals:
+
+1.  Compare how different surface summary statistics (i.e. Dx) changed
+    after the “first flush” at 1.A each site and 1.B longitudinally
+    along the mainstem and
+
+2.  Estimate the change in the amount of surface fines at each transect
+    (reported as % change over time). Note: The cuttoff for “fines” in
+    the litterature is a bit ambiguous. For now we will stick with
+    “fines” meaning \<6mm (though \<8mm could also been used).
+
+<!-- end list -->
 
   - There are some example papers vizualizing pebble count data in the
     CZU fire google drive [pebble count
@@ -168,30 +177,102 @@ Variable (column) description:
 
 ``` r
 str(pc)
-#> 'data.frame':    16 obs. of  8 variables:
-#>  $ Date          : Date, format: "2021-02-24" "2021-02-24" ...
-#>  $ Site          : Factor w/ 1 level "Lower eFishing": 1 1 1 1 1 1 1 1 1 1 ...
-#>  $ Transect      : int  1 1 1 1 1 1 1 1 1 1 ...
-#>  $ Round         : int  2 2 2 2 2 2 2 2 2 2 ...
-#>  $ Long_Station  : num  1 1 1 1 1 1 1 1 1 1 ...
-#>  $ Size_class_mm : num  1.9 2 2.8 4 5.6 8 11.3 16 22.6 32 ...
-#>  $ Category_total: num  40 0 0 1 3 4 6 5 10 14 ...
-#>  $ Percent_finer : num  0.404 0.404 0.404 0.414 0.444 ...
+#> grouped_df [736 x 8] (S3: grouped_df/tbl_df/tbl/data.frame)
+#>  $ Date          : Date[1:736], format: "2020-11-23" "2020-11-23" ...
+#>  $ Site          : Factor w/ 11 levels "Big Creek eFishing",..: 4 4 4 5 5 5 11 11 11 3 ...
+#>  $ Transect      : num [1:736] 1 2 3 1 2 3 1 2 3 1 ...
+#>  $ Round         : Factor w/ 2 levels "1","2": 1 1 1 1 1 1 1 1 1 1 ...
+#>  $ Long_Station  : num [1:736] 11 11 11 1 1 1 6 6 6 7 ...
+#>  $ Size_class_mm : num [1:736] 1.9 1.9 1.9 1.9 1.9 1.9 1.9 1.9 1.9 1.9 ...
+#>  $ Category_total: num [1:736] 53 48 42 50 19 41 22 23 20 35 ...
+#>  $ Percent_finer : num [1:736] 0.53 0.48 0.42 0.5 0.19 ...
+#>  - attr(*, "groups")= tibble [47 x 4] (S3: tbl_df/tbl/data.frame)
+#>   ..$ Round   : Factor w/ 2 levels "1","2": 1 1 1 1 1 1 1 1 1 1 ...
+#>   ..$ Site    : Factor w/ 11 levels "Big Creek eFishing",..: 1 1 1 2 2 2 3 3 3 4 ...
+#>   ..$ Transect: num [1:47] 1 2 3 1 2 3 1 2 3 1 ...
+#>   ..$ .rows   : list<int> [1:47] 
+#>   .. ..$ : int [1:16] 13 59 105 151 197 243 289 335 381 427 ...
+#>   .. ..$ : int [1:16] 14 60 106 152 198 244 290 336 382 428 ...
+#>   .. ..$ : int [1:16] 15 61 107 153 199 245 291 337 383 429 ...
+#>   .. ..$ : int [1:16] 16 62 108 154 200 246 292 338 384 430 ...
+#>   .. ..$ : int [1:16] 17 63 109 155 201 247 293 339 385 431 ...
+#>   .. ..$ : int [1:16] 18 64 110 156 202 248 294 340 386 432 ...
+#>   .. ..$ : int [1:15] 10 56 102 148 194 240 332 378 424 470 ...
+#>   .. ..$ : int [1:16] 11 57 103 149 195 241 287 333 379 425 ...
+#>   .. ..$ : int [1:16] 12 58 104 150 196 242 288 334 380 426 ...
+#>   .. ..$ : int [1:16] 1 47 93 139 185 231 277 323 369 415 ...
+#>   .. ..$ : int [1:16] 2 48 94 140 186 232 278 324 370 416 ...
+#>   .. ..$ : int [1:16] 3 49 95 141 187 233 279 325 371 417 ...
+#>   .. ..$ : int [1:16] 4 50 96 142 188 234 280 326 372 418 ...
+#>   .. ..$ : int [1:16] 5 51 97 143 189 235 281 327 373 419 ...
+#>   .. ..$ : int [1:16] 6 52 98 144 190 236 282 328 374 420 ...
+#>   .. ..$ : int [1:16] 19 65 111 157 203 249 295 341 387 433 ...
+#>   .. ..$ : int [1:16] 20 66 112 158 204 250 296 342 388 434 ...
+#>   .. ..$ : int [1:16] 21 67 113 159 205 251 297 343 389 435 ...
+#>   .. ..$ : int [1:16] 22 68 114 160 206 252 298 344 390 436 ...
+#>   .. ..$ : int [1:16] 23 69 115 161 207 253 299 345 391 437 ...
+#>   .. ..$ : int [1:16] 7 53 99 145 191 237 283 329 375 421 ...
+#>   .. ..$ : int [1:16] 8 54 100 146 192 238 284 330 376 422 ...
+#>   .. ..$ : int [1:16] 9 55 101 147 193 239 285 331 377 423 ...
+#>   .. ..$ : int [1:16] 30 76 122 168 214 260 306 352 398 444 ...
+#>   .. ..$ : int [1:16] 31 77 123 169 215 261 307 353 399 445 ...
+#>   .. ..$ : int [1:16] 32 78 124 170 216 262 308 354 400 446 ...
+#>   .. ..$ : int [1:16] 33 79 125 171 217 263 309 355 401 447 ...
+#>   .. ..$ : int [1:16] 34 80 126 172 218 264 310 356 402 448 ...
+#>   .. ..$ : int [1:16] 35 81 127 173 219 265 311 357 403 449 ...
+#>   .. ..$ : int [1:16] 39 85 131 177 223 269 315 361 407 453 ...
+#>   .. ..$ : int [1:16] 40 86 132 178 224 270 316 362 408 454 ...
+#>   .. ..$ : int [1:16] 41 87 133 179 225 271 317 363 409 455 ...
+#>   .. ..$ : int [1:16] 27 73 119 165 211 257 303 349 395 441 ...
+#>   .. ..$ : int [1:16] 28 74 120 166 212 258 304 350 396 442 ...
+#>   .. ..$ : int [1:16] 29 75 121 167 213 259 305 351 397 443 ...
+#>   .. ..$ : int [1:16] 24 70 116 162 208 254 300 346 392 438 ...
+#>   .. ..$ : int [1:16] 25 71 117 163 209 255 301 347 393 439 ...
+#>   .. ..$ : int [1:16] 26 72 118 164 210 256 302 348 394 440 ...
+#>   .. ..$ : int [1:16] 42 88 134 180 226 272 318 364 410 456 ...
+#>   .. ..$ : int [1:16] 43 89 135 181 227 273 319 365 411 457 ...
+#>   .. ..$ : int [1:16] 44 90 136 182 228 274 320 366 412 458 ...
+#>   .. ..$ : int [1:16] 45 91 137 183 229 275 321 367 413 459 ...
+#>   .. ..$ : int [1:16] 46 92 138 184 230 276 322 368 414 460 ...
+#>   .. ..$ : int [1:16] 36 82 128 174 220 266 312 358 404 450 ...
+#>   .. ..$ : int [1:16] 37 83 129 175 221 267 313 359 405 451 ...
+#>   .. ..$ : int [1:16] 38 84 130 176 222 268 314 360 406 452 ...
+#>   .. ..$ : int 286
+#>   .. ..@ ptype: int(0) 
+#>   ..- attr(*, ".drop")= logi TRUE
 ```
-
-\#Find gransize at percentiles
-
-Colin Nicol has generously shared his code (from previous work we did
-together). Create a function which interpolates a straight line between
-the two points nearest to the desired percentile `Dx`. Using the data
-provided, the function looks for the minimum grain size where the
-percent finer is greater than `Dx`. Then it calculates the slope between
-those two lines. From here, it uses the slope and the `rise` to get to
-50% to calculate a `run` (distance on the x-axis `grain size` we need to
-move from the known point to `D50`).
 
 ``` r
 
+#A quick plot of one transect
+
+#Make a test dataset using Big Creek Transect 3 with color noting each round.
+test.bc <- pc %>% 
+  filter(Site == "Big Creek eFishing")
+
+#Plot
+ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
+  geom_line() +
+  facet_grid(Transect ~ .) +
+  scale_x_log10(name = "Partical size [mm]") +
+  scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1)) +
+  theme_classic()
+```
+
+![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+
+**Find gransize at percentiles**
+
+Colin Nicol has generously shared his code to help with this. He created
+a function which interpolates a straight line between the two points
+nearest to the desired percentile `Dx`. Using the data provided, the
+function looks for the minimum grain size where the percent finer is
+greater than `Dx`. Then it calculates the slope between those two lines.
+From here, it uses the slope and the `rise` to get to 50% to calculate a
+`run` (distance on the x-axis `grain size` we need to move from the
+known point to `D50`).
+
+``` r
 
 #Pebble Count Summary Stat code from C. Nicol :)
 
@@ -217,24 +298,21 @@ calculate_dx <- function(dx, size, prcnt_finer) {
   
 }
 
-#Call in what you want to calculate. In this case its the median grain size (D50) of the test dataset. 
+#Call in what you want to calculate. In this case its the median grain size (D50) of the test dataset (one site). 
 
-calculate_dx(50, pc$Size_class_mm, pc$Percent_finer)
+calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
 #> [1] 8.825
 
 #Note, it will give you an error if the first category (i.e. <2mm) is greater than the percential you want to calculate.
 
-calculate_dx(16, pc$Size_class_mm, pc$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
-#> Warning in max(size[prcnt_finer <= dx]): no non-missing arguments to max;
-#> returning -Inf
-#> numeric(0)
+# calculate_dx(16, pc.test$Size_class_mm, pc.test$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
 
-#Once we have this function set up, loop through D16, D50 and D84.
+#Once we have this function set up, loop through D16, D50 and D84 for the one site.
 dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
 
 names(dxs) <- paste0('d', dxs)
 
-sapply(dxs, calculate_dx, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer) 
+sapply(dxs, calculate_dx, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer)
 #> Warning in max(size[prcnt_finer <= dx]): no non-missing arguments to max;
 #> returning -Inf
 #> $d16
@@ -245,6 +323,86 @@ sapply(dxs, calculate_dx, size = pc$Size_class_mm, prcnt_finer = pc$Percent_fine
 #> 
 #> $d84
 #> [1] 32.34667
+
+
+
+# Calculate summary stats for multiple transects all at once
+#Test dataset
+pc2.test <- pc.test %>%
+  summarize(
+    d50 = calculate_dx(50, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
+    d84 = calculate_dx(84, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer))
+
+####START HERE####
+#NOT WORKING FOR THE WHOLE DATASET!
+####
+
+pc2 <- pc %>%
+  # group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
+  summarize(
+            # d16 = calculate_dx(16, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
+    d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
+    d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
+#> `summarise()` has grouped output by 'Round', 'Site', 'Transect'. You can override using the `.groups` argument.
+```
+
+**Caculate change in % fines (\<6mm) for each transect** Start by
+summarising the % fines at each transect and then subtract round 1 from
+round 2. Poitive numbers mean the channel bed has gotten finer and
+negative numbers mean the bed has gotten more course.
+
+``` r
+
+#Subset data by Round
+pc3.r1 <- pc %>% 
+  filter(Round == 1) %>% #Round 1 data
+  filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+
+
+pc3.r2 <- pc %>% 
+filter(Round == 2) %>% #Round 2 data
+  filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+
+#Spread data into long format to calculate % change
+pc3 <- full_join(pc3.r1, pc3.r2, by = c("Site", "Transect")) %>% #Joins the two rounds of data
+  mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
+  mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
+  select(Site, Transect, Long_Station, fines_per_change)
+
+#Plot % fines change over longitudinal station distance
+
+#Subset data by mainstem vs tributary stations (See above for station number key)
+pc3.mainstem <- pc3 %>% 
+  filter(Long_Station < 8) %>% 
+  filter(Transect == 0 | Transect == 2)
+
+pc3.bigcreek <- pc3 %>% 
+  filter(Long_Station > 7 & Long_Station < 11) %>% 
+  filter(Transect == 0 | Transect == 2)
+
+pc3.littlecreek <- pc3 %>% 
+  filter(Long_Station == 11) %>% 
+  filter(Transect == 0 | Transect == 2)
+
+#Subset efishing reaches to make ranges for plot
+stattest <- pc3 %>% 
+  filter(Long_Station == 7)
+
+#Mainstem plot
+
+# ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
+#   geom_line() +
+  # scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+  # scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+  # theme_classic()
+#   geom_hline(yintercept = 0, lty = 2) +
+#   geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
+#   geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
+#   geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
+#   labs(title = "Change in percent fines (<6mm) along the mainstem", 
+#        subtitle = "Flow is from right (Upstream) to left (Downstream)",
+#        caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
+  
 ```
 
 ## Figure Output
