@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-22 March, 2021
+24 March, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -242,24 +242,63 @@ str(pc)
 #>   ..- attr(*, ".drop")= logi TRUE
 ```
 
+**Cumulative percent finer plots for the eFishing sites**
+
+Each eFishing site plot: each panel (facet) is a transect and line color
+denotes the two survey rounds (tan is before winter, blue is after first
+flush). The starting place and slope of each line gives you an idea of
+the sediment distribution. “Shifts in the lower end of the pebble count
+cumulative frequency curves are indicative of significant increases in
+streambed fines” (Potyondy and Hardy 1994). If the blue line starts
+above the tan line, the surface sediment became finer after the first
+flush.
+
+Potyondy and Hardy (1994) reccomend, “statistical comparison of particle
+size distributions can be done with 2 x 2 contingency tables (number of
+pebbles less than 6 mm versus the number of pebbles greater than or
+equal to 6 mm) and the likelihood ratio Chi-square statistic to compare
+one frequency distribution with another (King and Potyondy, 1993).”
+
 ``` r
 
-#A quick plot of one transect
-
-#Make a test dataset using Big Creek Transect 3 with color noting each round.
 test.bc <- pc %>% 
   filter(Site == "Big Creek eFishing")
 
-#Plot
-ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
+#Big Creek Plot
+bc <- ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
   geom_line() +
   facet_grid(Transect ~ .) +
-  scale_x_log10(name = "Partical size [mm]") +
+  scale_x_log10(name = "Partical size [Log10(mm)]") +
   scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1)) +
-  theme_classic()
+  scale_color_manual(values = c("#a6611a", "#018571")) +
+  theme_classic() +
+  ggtitle("Big Creek")
+
+test.um <- pc %>% 
+  filter(Site == "Upper Mainstem eFishing")
+
+#Upper Mainstem Plot - Not much change in the lower watershed. 
+um <- ggplot(test.um, aes(Size_class_mm, Percent_finer, color = Round)) +
+  geom_line() +
+  facet_grid(Transect ~ .) +
+  scale_x_log10(name = "Partical size [Log10(mm)]") +
+  scale_y_continuous(name = "", limits = c(0,1), expand = c(0,.1)) +
+  scale_color_manual(values = c("#a6611a", "#018571")) +
+  theme_classic() +
+  ggtitle("Upper Mainstem")
+
+#Put plots together using patchwork
+bc + um +
+  plot_layout(guides = 'collect') & 
+  theme(legend.position = 'bottom') 
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
+![](README_files/figure-gfm/Big%20Creek%20and%20the%20Lower%20mainstem%20quick%20line%20plot-1.png)<!-- -->
+
+``` r
+  # plot_annotation(caption = 'If the blue line starts above the tan line, it means the surface sediment became finer after the first flush.')
+  
+```
 
 **Find gransize at percentiles**
 
@@ -337,72 +376,214 @@ pc2.test <- pc.test %>%
 #NOT WORKING FOR THE WHOLE DATASET!
 ####
 
-pc2 <- pc %>%
-  # group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
-  summarize(
-            # d16 = calculate_dx(16, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
-    d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
-    d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
-#> `summarise()` has grouped output by 'Round', 'Site', 'Transect'. You can override using the `.groups` argument.
+# pc2 <- pc %>%
+#   # group_by(Site, Transect, Round) %>% # Creates a unique grouping variable
+#   summarize(
+#             # d16 = calculate_dx(16, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
+#     d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
+#     d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
 ```
 
-**Caculate change in % fines (\<6mm) for each transect** Start by
-summarising the % fines at each transect and then subtract round 1 from
-round 2. Poitive numbers mean the channel bed has gotten finer and
-negative numbers mean the bed has gotten more course.
+**Percent fines (\<6mm) along the mainstem**
+
+Plot following Potyondy and Hardy (1994) structure (% surface fines by
+longitude).
 
 ``` r
 
-#Subset data by Round
-pc3.r1 <- pc %>% 
-  filter(Round == 1) %>% #Round 1 data
-  filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+pc3.mainstem.fines <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% #select the fines size class.
+    filter(Long_Station < 8) %>% #mainstem stations
+  filter(Transect == 0 | Transect == 2) #use t2 fr each efishing reach
 
+a <- ggplot(pc3.mainstem.fines, aes(x = Long_Station, y = Percent_finer, color = Round)) +
+  geom_line() +
+  geom_point() +
+scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1.0), expand = c(0,0)) +
+scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+scale_color_manual(values = c("#a6611a", "#018571")) +
+theme_classic() +
+  geom_hline(yintercept = 0, lty = 2) +
+  labs(title = "Percent fines (<6mm) along the mainstem",
+       subtitle = "Flow is from right (Upstream) to left (Downstream)") +
+       # caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment.")
+  theme(axis.title.x = element_blank())
+```
 
-pc3.r2 <- pc %>% 
-filter(Round == 2) %>% #Round 2 data
-  filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+**Caculate change in % fines (\<6mm) for each transect**
 
-#Spread data into long format to calculate % change
-pc3 <- full_join(pc3.r1, pc3.r2, by = c("Site", "Transect")) %>% #Joins the two rounds of data
-  mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
-  mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
-  select(Site, Transect, Long_Station, fines_per_change)
+Start by summarising the % fines at each transect and then subtract
+round 1 from round 2. Poitive numbers mean the channel bed has gotten
+finer and negative numbers mean the bed has gotten more course.
 
-#Plot % fines change over longitudinal station distance
+``` r
 
-#Subset data by mainstem vs tributary stations (See above for station number key)
-pc3.mainstem <- pc3 %>% 
-  filter(Long_Station < 8) %>% 
-  filter(Transect == 0 | Transect == 2)
-
-pc3.bigcreek <- pc3 %>% 
-  filter(Long_Station > 7 & Long_Station < 11) %>% 
-  filter(Transect == 0 | Transect == 2)
-
-pc3.littlecreek <- pc3 %>% 
-  filter(Long_Station == 11) %>% 
-  filter(Transect == 0 | Transect == 2)
-
-#Subset efishing reaches to make ranges for plot
-stattest <- pc3 %>% 
-  filter(Long_Station == 7)
-
-#Mainstem plot
-
-# ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
+# #Subset data by Round
+# pc3.r1 <- pc %>% 
+#   filter(Round == 1) %>% #Round 1 data
+#   filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+# 
+# 
+# pc3.r2 <- pc %>% 
+# filter(Round == 2) %>% #Round 2 data
+#   filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
+# 
+# #Spread data into long format to calculate % change
+# pc3 <- full_join(pc3.r1, pc3.r2, by = c("Site", "Transect")) %>% #Joins the two rounds of data
+#   mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
+#   mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
+#   select(Site, Transect, Long_Station, fines_per_change)
+# 
+# #Plot % fines change over longitudinal station distance
+# 
+# #Subset data by mainstem vs tributary stations (See above for station number key)
+# pc3.mainstem <- pc3 %>% 
+#   filter(Long_Station < 8) %>% 
+#   filter(Transect == 0 | Transect == 2)
+# 
+# pc3.bigcreek <- pc3 %>% 
+#   filter(Long_Station > 7 & Long_Station < 11) %>% 
+#   filter(Transect == 0 | Transect == 2)
+# 
+# pc3.littlecreek <- pc3 %>% 
+#   filter(Long_Station == 11) %>% 
+#   filter(Transect == 0 | Transect == 2)
+# 
+# #Subset efishing reaches to make ranges for plot
+# stattest <- pc3 %>% 
+#   filter(Long_Station == 7)
+# 
+# #Mainstem plot
+# 
+# b <- ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
 #   geom_line() +
-  # scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
-  # scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
-  # theme_classic()
+#   geom_point() +
+# scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+# scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+# theme_classic() +
 #   geom_hline(yintercept = 0, lty = 2) +
 #   geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
 #   geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
 #   geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
-#   labs(title = "Change in percent fines (<6mm) along the mainstem", 
+#   labs(title = "Change in percent fines (<6mm) along the mainstem",
 #        subtitle = "Flow is from right (Upstream) to left (Downstream)",
 #        caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
-  
+# 
+# a / b
+```
+
+**Boxplots and stat tests of percent surface fines (before and after
+“first flush”)**
+
+``` r
+
+#Boxplot of percent surface fines using all sites/transects
+
+ pc4.fines <- pc %>% 
+  filter(Size_class_mm == 5.6)
+ 
+ plot.pc4.fines.all <- ggplot(pc4.fines, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot() +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0))  +
+  ggtitle("All sites")
+ 
+#Boxplot of percent surface fines on mainstem
+ pc4.fines.mainstem <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% 
+  filter(Long_Station < 8)
+
+ plot.pc4.fines.mainstem <- ggplot(pc4.fines.mainstem, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot(fill = c("#a6611a", "#018571")) +
+   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+   theme_classic() +
+   ggtitle("Scott Creek Mainstem (n=13)")
+ 
+#Boxplot of percent surface fines on Big Creek
+ pc4.fines.bc <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% 
+  filter(Long_Station > 7 & Long_Station < 11)
+
+ plot.pc4.fines.bc <- ggplot(pc4.fines.bc, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot(fill = c("#a6611a", "#018571")) +
+   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+   theme_classic() +
+   theme(axis.title.y = element_blank()) +
+   ggtitle("Big Creek (n=7)")
+   
+ 
+#Boxplot of percent surface fines on Little Creek
+ pc4.fines.lc <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% 
+  filter(Long_Station == 11)
+
+ plot.pc4.fines.lc <- ggplot(pc4.fines.lc, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot(fill = c("#a6611a", "#018571")) +
+   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+   theme_classic() +
+   theme(axis.title.y = element_blank()) +
+   ggtitle("Little Creek (n=3)")
+ 
+#Put plots together using patchwork
+plot.pc4.fines.mainstem +  plot.pc4.fines.bc +  plot.pc4.fines.lc
+```
+
+![](README_files/figure-gfm/Boxplot%20of%20percent%20surface%20fines-1.png)<!-- -->
+
+``` r
+
+
+
+
+#Need to figure out if we are using T Tests or Chi-squared test for independance?
+
+#Before running the t tests we need to think about independance. 
+
+#Mainstem
+ pc4.fines.mainstem.r1 <-  pc4.fines.mainstem %>% 
+     filter(Round == 1) %>% #Round 1 data  
+     select(Percent_finer)
+#> Adding missing grouping variables: `Round`, `Site`, `Transect`
+ 
+pc4.fines.mainstem.r2 <-  pc4.fines.mainstem %>% 
+     filter(Round == 2) %>% #Round 2 data
+     select(Percent_finer)
+#> Adding missing grouping variables: `Round`, `Site`, `Transect`
+
+# t.test( pc4.fines.mainstem.r1$Percent_finer,  pc4.fines.mainstem.r2$Percent_finer, alternative = "two.sided") #May need to adjust the alternative to "greater than".
+
+# Big Creek
+
+ pc4.fines.bc.r1 <-  pc4.fines.bc %>% 
+     filter(Round == 1) %>% #Round 1 data  
+     select(Percent_finer)
+#> Adding missing grouping variables: `Round`, `Site`, `Transect`
+ 
+pc4.fines.bc.r2 <-  pc4.fines.bc %>% 
+     filter(Round == 2) %>% #Round 2 data
+     select(Percent_finer)
+#> Adding missing grouping variables: `Round`, `Site`, `Transect`
+
+# t.test( pc4.fines.bc.r1$Percent_finer,  pc4.fines.bc.r2$Percent_finer, alternative = "two.sided") #May need to adjust the alternative to "greater than".
+
+#Little Creek
+ pc4.fines.lc.r1 <-  pc4.fines.lc %>% 
+     filter(Round == 1) %>% #Round 1 data  
+     select(Percent_finer)
+#> Adding missing grouping variables: `Round`, `Site`, `Transect`
+ 
+pc4.fines.lc.r2 <-  pc4.fines.lc %>% 
+     filter(Round == 2) %>% #Round 2 data
+     select(Percent_finer)
+#> Adding missing grouping variables: `Round`, `Site`, `Transect`
+
+# t.test( pc4.fines.lc.r1$Percent_finer,  pc4.fines.lc.r2$Percent_finer, alternative = "two.sided") #May need to adjust the alternative to "greater than".
 ```
 
 ## Figure Output
