@@ -43,7 +43,7 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 library(tidyverse)
 library(dplyr)
 library(lubridate)
-library(ggplot2)
+# library(ggplot2)
 library(patchwork)
 
 ```
@@ -250,22 +250,44 @@ Variable (column) description:
 str(pc)
 ```
 
+*Cumulative percent finer plots for the eFishing sites*
 
-```{r}
+Each eFishing site plot: each panel (facet) is a transect and line color denotes the two survey rounds (tan is before winter, blue is after first flush). The starting place and slope of each line gives you an idea of the sediment distribution. If the blue line starts above the tan line, the surface sediment became finer after the first flush. If the slope is flat 
 
-#A quick plot of one transect
+```{r, Big Creek and the Lower mainstem quick line plot}
 
-#Make a test dataset using Big Creek Transect 3 with color noting each round.
 test.bc <- pc %>% 
   filter(Site == "Big Creek eFishing")
 
-#Plot
-ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
+#Big Creek Plot
+bc <- ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
   geom_line() +
   facet_grid(Transect ~ .) +
-  scale_x_log10(name = "Partical size [mm]") +
+  scale_x_log10(name = "Partical size [Log10(mm)]") +
   scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1)) +
-  theme_classic()
+  scale_color_manual(values = c("#a6611a", "#018571")) +
+  theme_classic() +
+  ggtitle("Big Creek")
+
+test.um <- pc %>% 
+  filter(Site == "Upper Mainstem eFishing")
+
+#Upper Mainstem Plot - Not much change in the lower watershed. 
+um <- ggplot(test.lm, aes(Size_class_mm, Percent_finer, color = Round)) +
+  geom_line() +
+  facet_grid(Transect ~ .) +
+  scale_x_log10(name = "Partical size [Log10(mm)]") +
+  scale_y_continuous(name = "", limits = c(0,1), expand = c(0,.1)) +
+  scale_color_manual(values = c("#a6611a", "#018571")) +
+  theme_classic() +
+  ggtitle("Upper Mainstem")
+
+#Put plots toegther using patchwork
+bc + um +
+  plot_layout(guides = 'collect') & 
+  theme(legend.position = 'bottom') &
+  plot_annotation(caption = 'If the blue line starts above the tan line, it means the surface sediment became finer after the first flush.')
+  
 ```
 
 
@@ -379,21 +401,66 @@ stattest <- pc3 %>%
 
 #Mainstem plot
 
-# ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
-#   geom_line() +
-  # scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
-  # scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
-  # theme_classic()
-#   geom_hline(yintercept = 0, lty = 2) +
-#   geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
-#   geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
-#   geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
-#   labs(title = "Change in percent fines (<6mm) along the mainstem", 
-#        subtitle = "Flow is from right (Upstream) to left (Downstream)",
-#        caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
+ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
+  geom_line() +
+scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+theme_classic()
+  geom_hline(yintercept = 0, lty = 2) +
+  geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
+  geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
+  geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
+  labs(title = "Change in percent fines (<6mm) along the mainstem",
+       subtitle = "Flow is from right (Upstream) to left (Downstream)",
+       caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
   
+#Boxplot of percent surface fines using all sites/transects
 
+ pc4.fines <- pc %>% 
+  filter(Size_class_mm == 5.6)
+ 
+ plot.pc4.fines.all <- ggplot(pc4.fines, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot() +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0))  +
+  ggtitle("All sites")
+ 
+#Boxplot of percent surface fines on mainstem
+ pc4.fines.mainstem <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% 
+  filter(Long_Station < 8)
 
+ plot.pc4.fines.mainstem <- ggplot(pc4.fines.mainstem, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot() +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+  ggtitle("Scott Creek Mainstem (13T)")
+ 
+#Boxplot of percent surface fines on Big Creek
+ pc4.fines.bc <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% 
+  filter(Long_Station > 7 & Long_Station < 11)
+
+ plot.pc4.fines.bc <- ggplot(pc4.fines.bc, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot() +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+  ggtitle("Big Creek (7T)")
+   
+ 
+#Boxplot of percent surface fines on Little Creek
+ pc4.fines.lc <- pc %>% 
+  filter(Size_class_mm == 5.6) %>% 
+  filter(Long_Station == 11)
+
+ plot.pc4.fines.lc <- ggplot(pc4.fines.lc, aes(x = Round, y = Percent_finer)) +
+   geom_boxplot() +
+   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+  ggtitle("Little Creek (3T)")
+ 
+#Put plots together using patchwork
+plot.pc4.fines.mainstem +  plot.pc4.fines.bc +  plot.pc4.fines.lc
 ```
 
 

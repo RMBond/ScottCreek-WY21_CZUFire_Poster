@@ -55,5 +55,6 @@ ggplot(pc3.8.mainstem, aes(x = Long_Station, y = fines_per_change)) +
        caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. Dotted vertical lines are ranges at the eFishing sites.")
 
 
-
+#Dx calculation experimental code:
+pc.test$Percent_finer) = -Inf,"small", 1),
 
