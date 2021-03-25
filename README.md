@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-24 March, 2021
+25 March, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -293,7 +293,7 @@ bc + um +
   theme(legend.position = 'bottom') 
 ```
 
-![](README_files/figure-gfm/Big%20Creek%20and%20the%20Lower%20mainstem%20quick%20line%20plot-1.png)<!-- -->
+![](README_files/figure-gfm/Big%20Creek%20and%20the%20Lower%20mainstem%20quick%20cumulative%20percent%20finer%20plots-1.png)<!-- -->
 
 ``` r
   # plot_annotation(caption = 'If the blue line starts above the tan line, it means the surface sediment became finer after the first flush.')
@@ -394,20 +394,23 @@ longitude).
 pc3.mainstem.fines <- pc %>% 
   filter(Size_class_mm == 5.6) %>% #select the fines size class.
     filter(Long_Station < 8) %>% #mainstem stations
-  filter(Transect == 0 | Transect == 2) #use t2 fr each efishing reach
+  filter(Transect == 0 | Transect == 2) #use T2 (midpoint) for each eFishing reach.
 
 a <- ggplot(pc3.mainstem.fines, aes(x = Long_Station, y = Percent_finer, color = Round)) +
   geom_line() +
   geom_point() +
-scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1.0), expand = c(0,0)) +
-scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
-scale_color_manual(values = c("#a6611a", "#018571")) +
+scale_y_continuous(name = "Percent surface fines", limits = c(0,1.0), expand = c(0,0)) +
+scale_x_continuous(name = "Station Number", limits = c(1,7), breaks = seq(0,7,1)) +
+scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
 theme_classic() +
   geom_hline(yintercept = 0, lty = 2) +
-  labs(title = "Percent fines (<6mm) along the mainstem",
-       subtitle = "Flow is from right (Upstream) to left (Downstream)") +
+  labs(title = "A") +
+       # subtitle = "Flow is from right (upstream) to left (downstream)") +
        # caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment.")
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank())
 ```
 
 **Caculate change in % fines (\<6mm) for each transect**
@@ -419,12 +422,12 @@ finer and negative numbers mean the bed has gotten more course.
 ``` r
 
 # #Subset data by Round
-# pc3.r1 <- pc %>% 
+# pc3.r1 <- pc %>%
 #   filter(Round == 1) %>% #Round 1 data
 #   filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
 # 
 # 
-# pc3.r2 <- pc %>% 
+# pc3.r2 <- pc %>%
 # filter(Round == 2) %>% #Round 2 data
 #   filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
 # 
@@ -437,20 +440,20 @@ finer and negative numbers mean the bed has gotten more course.
 # #Plot % fines change over longitudinal station distance
 # 
 # #Subset data by mainstem vs tributary stations (See above for station number key)
-# pc3.mainstem <- pc3 %>% 
-#   filter(Long_Station < 8) %>% 
+# pc3.mainstem <- pc3 %>%
+#   filter(Long_Station < 8) %>%
 #   filter(Transect == 0 | Transect == 2)
 # 
-# pc3.bigcreek <- pc3 %>% 
-#   filter(Long_Station > 7 & Long_Station < 11) %>% 
+# pc3.bigcreek <- pc3 %>%
+#   filter(Long_Station > 7 & Long_Station < 11) %>%
 #   filter(Transect == 0 | Transect == 2)
 # 
-# pc3.littlecreek <- pc3 %>% 
-#   filter(Long_Station == 11) %>% 
+# pc3.littlecreek <- pc3 %>%
+#   filter(Long_Station == 11) %>%
 #   filter(Transect == 0 | Transect == 2)
 # 
 # #Subset efishing reaches to make ranges for plot
-# stattest <- pc3 %>% 
+# stattest <- pc3 %>%
 #   filter(Long_Station == 7)
 # 
 # #Mainstem plot
@@ -458,16 +461,17 @@ finer and negative numbers mean the bed has gotten more course.
 # b <- ggplot(pc3.mainstem, aes(x = Long_Station, y = fines_per_change)) +
 #   geom_line() +
 #   geom_point() +
-# scale_y_continuous(name = "Percent Change (<6mm)", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
-# scale_x_continuous(name = "Longitudinal Distance", limits = c(1,7), breaks = seq(0,7,1)) +
+# scale_y_continuous(name = "Change in percent fines", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
+# scale_x_continuous(name = "Station Number", limits = c(1,7), breaks = seq(0,7,1)) +
 # theme_classic() +
 #   geom_hline(yintercept = 0, lty = 2) +
-#   geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
-#   geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
-#   geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
-#   labs(title = "Change in percent fines (<6mm) along the mainstem",
-#        subtitle = "Flow is from right (Upstream) to left (Downstream)",
-#        caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
+#   # geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
+#   # geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
+#   # geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
+# labs(title = "B")
+#   # labs(title = "Change in percent fines (<6mm) along the mainstem",
+#   #      subtitle = "Flow is from right (Upstream) to left (Downstream)",
+#   #      caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
 # 
 # a / b
 ```
@@ -539,11 +543,35 @@ plot.pc4.fines.mainstem +  plot.pc4.fines.bc +  plot.pc4.fines.lc
 ``` r
 
 
+#Variation in Percent Fines for each eFishing Site starting with pc4.fines
+
+#Grab the eFishing sites
+pc4.efishing <- pc4.fines %>% 
+  filter(grepl('eFishing', Site)) #using grepl to select all sites with "efishing" in the name 
+
+#Tell r Sites will be in a specific order.
+pc4.efishing$Site <- factor(pc4.efishing$Site, levels = c("Dog eFishing","Upper Mainstem eFishing","Lower Mainstem eFishing","Big Creek Powerhouse eFishing","Big Creek eFishing", "Little Creek eFishing"),ordered = TRUE)
+
+#Scatterplot to see the variation (3 transects) in percent fines for each eFishing Site.
+ggplot(pc4.efishing, aes(x = Site, y = Percent_finer, color = Round)) +
+  geom_jitter(width = 0.1) +
+  scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
+                      expand = c(0,0)) +
+  scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
+  theme_classic() +
+  theme(legend.position = "top",
+        legend.title = element_blank())
+```
+
+![](README_files/figure-gfm/Boxplot%20of%20percent%20surface%20fines-2.png)<!-- -->
+
+``` r
+
 
 
 #Need to figure out if we are using T Tests or Chi-squared test for independance?
 
-#Before running the t tests we need to think about independance. 
+#Before running the t tests we need to think about independance (repeated measures??. 
 
 #Mainstem
  pc4.fines.mainstem.r1 <-  pc4.fines.mainstem %>% 
