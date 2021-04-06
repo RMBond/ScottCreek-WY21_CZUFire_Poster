@@ -35,9 +35,19 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 ## Next Steps
 
-1. Decide on which WQ parameters to present and continue to update WQ data csv file as needed. 
+**WQ Dataset** 
 
-2. RB is working on code for making pebble count summaries and potential plotting.
+1. Decide on which WQ parameters to present, 
+
+2. clean up the raw data (i.e. remove spurious measurments), and 
+
+3. decide on the timeseries of intrest and continue to update WQ data csv file as needed. 
+
+**Pebble Count Dataset** 
+
+1. Generate pebble count summaries.
+
+
 
 ```{r Package Setup, echo = FALSE, message = FALSE}
 library(tidyverse)
@@ -54,18 +64,9 @@ library(patchwork)
 
 Goal: Visualize WQ time-series during the "first flush". 
 
-```{r WQ Data Wrangling, echo = FALSE}
+Script: 1_WQ_Data.R
 
-wq.dat <- read.csv("Data/Scott_Creek_Weir_Hydrolab_20210303.csv", sep = ",", header = T) #Initial water qualiy test dataset.
-
-wq <- wq.dat %>% #Start formatting columns into r "tidy" structure.
-  mutate(Date = mdy(Date)) %>% #R sees dates as Year-Month-Day this tells it where to get that info from the date column.
-  mutate(Time = hms(Time)) %>% # Tells r this column is Hours:Min:Sec
-  mutate(TS = as.POSIXct(Date + Time)) %>% #making a new column with timestamp by combining Date and Time
-  select(Date, TS, Temp_C, TurbSC_NTU, Dep100_m, pH, Sal_ppt, LDO_mg_l)#pair down dataset to what we need
-
-```
-Dataset name = wq
+Dataset name: wq
 
 Variable (column) description:
 
@@ -78,74 +79,19 @@ Variable (column) description:
 * Sal_ppt = Salinity [parts per thousand] 
 * LDO_mg_l = Dissolved Oxygen [mg/L]
 
-```{r WQ Data Structure}
-str(wq)
-```
-
-```{r WQ Plotting, echo = FALSE, message = FALSE, warning = FALSE}
-
-#Set data limits
-limits = as.POSIXct(c("2021-01-01 00:00:00", "2021-03-01 00:00:00"))
-
-#Start making plots
-#Water depth
-depth.plot <- ggplot(wq, aes(x = TS, y = Dep100_m)) +
-  geom_line() +
-  scale_x_datetime(name = "",
-                   date_breaks = "1 week", date_labels = ("%b %d"),
-                   limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "Height [m]", limits = c(1.5, 3.5)) +
-theme_classic()
-
-#Turbidity
-turb.plot <- ggplot(wq, aes(x = TS, y = TurbSC_NTU)) +
-  geom_line() +
-  scale_x_datetime(name = "",
-                   date_breaks = "1 week", date_labels = ("%b %d"),
-                   limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "Turbidity [NTU]", limits = c(0, 3000)) +
-theme_classic()
-
-#pH
-pH.plot <- ggplot(wq, aes(x = TS, y = pH)) +
-  geom_line() +
-  scale_x_datetime(name = "",
-                   date_breaks = "1 week", date_labels = ("%b %d"),
-                   limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "pH", limits = c(7, 8)) +
-theme_classic()
-
-#DO
-do.plot <- ggplot(wq, aes(x = TS, y = LDO_mg_l)) +
-  geom_line() +
-  scale_x_datetime(name = "",
-                   date_breaks = "1 week", date_labels = ("%b %d"),
-                   limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "DO [mg/L]", limits = c(8.5, 12.1)) +
-theme_classic()
-
-#Temperature
-temp.plot <- ggplot(wq, aes(x = TS, y = Temp_C)) +
-  geom_line() +
-  scale_x_datetime(name = "",
-                   date_breaks = "1 week", date_labels = ("%b %d"),
-                   limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "Temperature [*C]", limits = c(6.5, 25.5)) +
-theme_classic()
 
 
-# #Salinity - not much to see since its freshwater the whole time.
-# sal.plot <- ggplot(wq, aes(x = TS, y = Sal_ppt)) +
-#   geom_line() +
-#   scale_x_datetime(name = "",
-#                    date_breaks = "1 week", date_labels = ("%b %d"),
-#                    limits = limits, expand = c(0,0)) +
-#   scale_y_continuous(name = "Salinity [ppt]", limits = c(8.5, 12.1)) +
-# theme_classic()
+Here is the current plot using **RAW** data with all of the WQ variables (minus Salinity). We will need to "clean up" the data (e.g. remove/ smooth data when the instrument was moved for downloading, etc.)
 
 
-#Using Patchwork pckage to put individual plots together into one multi-plot
-depth.plot / turb.plot / pH.plot / do.plot / temp.plot
+![Raw WQ Plot](Figures/WQ_20210406_6x6.jpg)
+
+
+
+```{r WQ Code source, echo = FALSE}
+
+#To run the WQ script directly in this .rmd file use the function below
+#source("1_WQ_Data.R", local = knitr::knit_global())
 
 ```
 
@@ -154,33 +100,14 @@ depth.plot / turb.plot / pH.plot / do.plot / temp.plot
 
 Goal: Visualize Hydrograph time-series during the "first flush". Note this data will *not* be presented in the poster.
 
-```{r Hydrograph Data Wrangling}
-# library(lubridate)
-# library(ggplot2)
-# library(scales)
-# library(gridExtra)
-# library(dplyr)
-# options(scipen = 999)
+Script: 2_Hydrograph_Data.R
 
-# #Bring in datasets
-# gage.dat <- read.csv("data/Gagedata_XXX.csv", h = T)#Flows up to 30 January 2021 6891 obs of 2 var.
-# 
-# #Clean up hydrograph data
-# gage <- gage.dat %>% #Start formatting columns into r "tidy" structure.
-#   mutate(DT = mdy_hm(as.character(timestamp))) %>% # clean up time data
-#   mutate(stage_m = stage_ft*0.3048) %>% #Convert from ft to m
-#   select(DT, stage_m)
-# 
-# str(gage)
-# 
-# #Hydrograph 
-# #Plot 1 - basic plot
-# ggplot(gage,aes(DT,stage_m)) +
-#   geom_point() +
-#   scale_x_datetime(name = "",
-#                    date_breaks = "1 month", date_labels = ("%b")) +
-#   scale_y_continuous(name = "Height (m)") +
-# theme_classic() 
+Dataset name: gage
+
+```{r Hydrograph code source, echo = FALSE}
+
+#To run the Hydrograph script directly in this .rmd file use the function below
+#source("2_Hydrograph_Data.R", local = knitr::knit_global())
 ```
 
 
@@ -196,38 +123,6 @@ Goals:
 
 * There are some example papers vizualizing pebble count data in the CZU fire google drive [pebble count folder](https://drive.google.com/drive/u/1/folders/1MwYFVTyhN1_3NMqhlwIAu8DBYOm8KzSo).
 
-
-```{r Pebble Count Data Wrangling, echo = FALSE}
-
-#Test Data
-pc.dat.test <- read.csv("Data/Scott_Creek_Pebble_Testdata_20210315.csv", sep = ",", header = T) #Initial pebble count test dataset. It consists of one transects worth of data.
-
-pc.test <- pc.dat.test %>% #Start formatting columns into r "tidy" structure.
-  mutate(Date = mdy(Date)) %>% 
-  mutate(Round = as.factor(Round)) %>% #change column to type = factor
-  mutate(Long_Station = as.numeric(Long_Station)) %>% #change column to type = numeric.
-  mutate(Category_total = as.numeric(Category_total)) %>% #change column to type = numeric.
-  arrange(Size_class_mm) %>% #makes sure data goes from smallest to larges pebble sizes.
-  mutate(Percent_finer = cumsum(Category_total)/sum(Category_total)) #creat column for percent finer than.
-
-
-#Real (whole) Data
-#Note Round was blank for one size class at the Dog eFishing reach in the original WSP file. This was corrected on 3/31/21
-
-pc.dat <- read.csv("Data/Scott_Creek_Pebble_20210331.csv", sep = ",", header = T) #736 obs of 7 var. 
-
-pc <- pc.dat %>% #Start formatting columns into r "tidy" structure.
-  mutate(Date = ymd(Date)) %>% 
-  mutate(Round = as.factor(Round)) %>% #change column to type = factor
-  mutate(Long_Station = as.numeric(Long_Station)) %>% #change column to type = numeric.
-  mutate(Category_total = as.numeric(Category_total)) %>% #change column to type = numeric.
-  mutate(Transect = replace_na(Transect, 0)) %>% #replace na (for PCX transects) with a zero 
-  group_by(Round, Site, Transect) %>% #Tells r to group each individual transect worth of data to calculate % finer.
-  arrange(Size_class_mm) %>% #makes sure data goes from smallest to larges pebble sizes.
-  mutate(Percent_finer = cumsum(Category_total)/sum(Category_total)) #creat column for percent finer than. 
-
-
-```
 
 Dataset name = pc
 
@@ -249,9 +144,14 @@ Variable (column) description:
 
 * Percent_finer = Cumulative percent finer for each size class. This is used for calculating the Dx statistic. 
 
-```{r Pebble Count Data Structure}
-str(pc)
+
+```{r Pebble Count Code source, echo = FALSE}
+
+#To run the WQ script directly in this .rmd file use the function below
+#source("3_Pebble_Count_Data.R", local = knitr::knit_global())
+
 ```
+
 
 **Cumulative percent finer plots for the eFishing sites**
 
@@ -260,261 +160,22 @@ increases in streambed fines" (Potyondy and Hardy 1994). If the blue line starts
 
 Potyondy and Hardy (1994) reccomend, "statistical comparison of particle size distributions can be done with 2 x 2 contingency tables (number of pebbles less than 6 mm versus the number of pebbles greater than or equal to 6 mm) and the likelihood ratio Chi-square statistic to compare one frequency distribution with another (King and Potyondy, 1993)."
 
+![Cumulative percent finer plot](Figures/PC_20210406_5x4.jpg)
 
-```{r Quick cumulative percent finer plots}
+**Percent fines (<6mm) and change in percent fines along the mainstem**
 
-#Goal: Quickly visualize some of the transect changes between survey rounds.(Not intended for the poster). 
+Panel A (fines) - follows Potyondy and Hardy (1994) structure (% surface fines by longitude). 
 
-test.bc <- pc %>% 
-  filter(Site == "Big Creek eFishing")
+Panel B (Change in fines) - Start by summarising the % fines at each transect and then subtract round 1 from round 2. Positive numbers mean the channel bed has gotten finer and negative numbers mean the bed has gotten more course.
 
-#Big Creek Plot - Subtle changes in sediment.
-bc <- ggplot(test.bc, aes(Size_class_mm, Percent_finer, color = Round)) +
-  geom_line() +
-  facet_grid(Transect ~ .) +
-  scale_x_log10(name = "Partical size [Log10(mm)]") +
-  scale_y_continuous(name = "Cumulative percent finer", limits = c(0,1), expand = c(0,.1)) +
-  scale_color_manual(values = c("#a6611a", "#018571")) +
-  theme_classic() +
-  ggtitle("Big Creek")
-
-test.um <- pc %>% 
-  filter(Site == "Upper Mainstem eFishing")
-
-#Upper Mainstem Plot - Fines have increased substantially in the upper watershed. 
-um <- ggplot(test.um, aes(Size_class_mm, Percent_finer, color = Round)) +
-  geom_line() +
-  facet_grid(Transect ~ .) +
-  scale_x_log10(name = "Partical size [Log10(mm)]") +
-  scale_y_continuous(name = "", limits = c(0,1), expand = c(0,.1)) +
-  scale_color_manual(values = c("#a6611a", "#018571")) +
-  theme_classic() +
-  ggtitle("Upper Mainstem")
-
-#Put plots together using patchwork
-bc + um +
-  plot_layout(guides = 'collect') & 
-  theme(legend.position = 'bottom') 
-  # plot_annotation(caption = 'If the blue line starts above the tan line, it means the surface sediment became finer after the first flush.')
-  
-```
-
-**Percent fines (<6mm) along the mainstem**
-
-Plot following Potyondy and Hardy (1994) structure (% surface fines by longitude). 
-
-```{r Percent surface fines along the mainstem by station number (pc2)}
-
-#Goal: Visualize the amount (percent surface fines along the mainstem. Station number is used to lign up the sites from downstream to upstream.
-
-pc2.mainstem.fines <- pc %>% 
-  filter(Size_class_mm == 5.6) %>% #select the fines size class.
-    filter(Long_Station < 8) %>% #mainstem stations
-  filter(Transect == 0 | Transect == 2) #use T2 (midpoint) for each eFishing reach.
-
-a <- ggplot(pc2.mainstem.fines, aes(x = Long_Station, y = Percent_finer, color = Round)) +
-  geom_line() +
-  geom_point() +
-scale_y_continuous(name = "Percent surface fines", limits = c(0,1.0), expand = c(0,0)) +
-scale_x_continuous(name = "Station Number", limits = c(1,7), breaks = seq(0,7,1)) +
-scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
-theme_classic() +
-  geom_hline(yintercept = 0, lty = 2) +
-  labs(title = "A") +
-       # subtitle = "Flow is from right (upstream) to left (downstream)") +
-       # caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment.")
-  theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
-        legend.position = "top",
-        legend.title = element_blank())
-
-```
+![Percent fines along the mainstem plot](Figures/PC_percent_fines_mainstem_20210406_6x6.jpg)
 
 
-**Caculate change in % fines (<6mm) for each transect**
-
-Start by summarising the % fines at each transect and then subtract round 1 from round 2. Positive numbers mean the channel bed has gotten finer and negative numbers mean the bed has gotten more course.
-
-```{r Caculate change in % fines (<6mm) for each transect (pc2)}
-
-#Goal: Caculate the change in % fines (<6mm) between the two survey rounds for each transect and site.
-
-#Note: Knitting the .md file doesn't like this code for some reacon so it is commented out hoever the code is good and necessary for generating the plot to look at change in percent fines by station number.
-
-# #Subset data by Round
-# pc2.r1 <- pc %>%
-#   filter(Round == 1) %>% #Round 1 data
-#   filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
-# 
-# 
-# pc2.r2 <- pc %>%
-# filter(Round == 2) %>% #Round 2 data
-#   filter(Size_class_mm == 5.6) #focus on the 5.6 size class for each transect
-# 
-# #Spread data into long format to calculate % change
-# pc2 <- full_join(pc2.r1, pc2.r2, by = c("Site", "Transect")) %>% #Joins the two rounds of data
-#   mutate(fines_per_change = Percent_finer.y - Percent_finer.x) %>% #Subract round 1 from round 2. A positive number means an increase in fines after the first flush.
-#   mutate(Long_Station = Long_Station.x) %>% #relabeling station for clarity
-#   select(Site, Transect, Long_Station, fines_per_change)
-# 
-# #Plot % fines change over longitudinal station distance
-# 
-# #Subset data by mainstem vs tributary stations (See above for station number key)
-# pc2.mainstem <- pc2 %>%
-#   filter(Long_Station < 8) %>%
-#   filter(Transect == 0 | Transect == 2)
-# 
-# pc2.bigcreek <- pc2 %>%
-#   filter(Long_Station > 7 & Long_Station < 11) %>%
-#   filter(Transect == 0 | Transect == 2)
-# 
-# pc2.littlecreek <- pc2 %>%
-#   filter(Long_Station == 11) %>%
-#   filter(Transect == 0 | Transect == 2)
-# 
-# #Subset efishing reaches to make ranges for plot
-# stattest <- pc2 %>%
-#   filter(Long_Station == 7)
-# 
-# #Mainstem plot
-# 
-# b <- ggplot(pc2.mainstem, aes(x = Long_Station, y = fines_per_change)) +
-#   geom_line() +
-#   geom_point() +
-# scale_y_continuous(name = "Change in percent fines", limits = c(-0.2,0.45), breaks = seq(-0.2,0.45,.1), expand = c(0,0)) +
-# scale_x_continuous(name = "Station Number", limits = c(1,7), breaks = seq(0,7,1)) +
-# theme_classic() +
-#   geom_hline(yintercept = 0, lty = 2) +
-#   # geom_segment(x = 1, y = -0.13, xend = 1, yend = 0.08, lty = 3) + #variation in Station 1
-#   # geom_segment(x = 6, y = 0.12, xend = 6, yend = 0.25, lty = 3) + #variation in Station 6
-#   # geom_segment(x = 7, y = -0.11, xend = 7, yend = 0.3857, lty = 3) + #variation in Station 7
-# labs(title = "B")
-#   # labs(title = "Change in percent fines (<6mm) along the mainstem",
-#   #      subtitle = "Flow is from right (Upstream) to left (Downstream)",
-#   #      caption = "The meainstem between Big and Little Creeks (Station 3) and the upper watershed \n (Stations 6 and 7) had the biggest increases in fine sediment. \n Dotted vertical lines are ranges at the eFishing sites.")
-# 
-# a / b
-```
 
 **Boxplots and stat tests of percent surface fines (before and after "first flush")**
 
-```{r Boxplot of percent surface fines (pc3)}
+![Percent fines Boxplot](Figures/PC_percent_fines_boxplot_20210406_6x3.jpg)
 
-#Goal: Boxplot of percent surface fines using all sites/transects
-
- pc3.fines <- pc %>% 
-  filter(Size_class_mm == 5.6)
- 
- plot.pc3.fines.all <- ggplot(pc3.fines, aes(x = Round, y = Percent_finer)) +
-   geom_boxplot() +
-   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
-                      expand = c(0,0))  +
-  ggtitle("All sites")
- 
-#Boxplot of percent surface fines on mainstem
- pc3.fines.mainstem <- pc %>% 
-  filter(Size_class_mm == 5.6) %>% 
-  filter(Long_Station < 8)
-
- plot.pc3.fines.mainstem <- ggplot(pc3.fines.mainstem, aes(x = Round, y = Percent_finer)) +
-   geom_boxplot(fill = c("#a6611a", "#018571")) +
-   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
-   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
-                      expand = c(0,0)) +
-   theme_classic() +
-   ggtitle("Scott Creek Mainstem (n=13)")
- 
-#Boxplot of percent surface fines on Big Creek
- pc3.fines.bc <- pc %>% 
-  filter(Size_class_mm == 5.6) %>% 
-  filter(Long_Station > 7 & Long_Station < 11)
-
- plot.pc3.fines.bc <- ggplot(pc3.fines.bc, aes(x = Round, y = Percent_finer)) +
-   geom_boxplot(fill = c("#a6611a", "#018571")) +
-   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
-   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
-                      expand = c(0,0)) +
-   theme_classic() +
-   theme(axis.title.y = element_blank()) +
-   ggtitle("Big Creek (n=7)")
-   
- 
-#Boxplot of percent surface fines on Little Creek
- pc3.fines.lc <- pc %>% 
-  filter(Size_class_mm == 5.6) %>% 
-  filter(Long_Station == 11)
-
- plot.pc3.fines.lc <- ggplot(pc3.fines.lc, aes(x = Round, y = Percent_finer)) +
-   geom_boxplot(fill = c("#a6611a", "#018571")) +
-   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
-   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
-                      expand = c(0,0)) +
-   theme_classic() +
-   theme(axis.title.y = element_blank()) +
-   ggtitle("Little Creek (n=3)")
- 
-#Put plots together using patchwork
-plot.pc3.fines.mainstem +  plot.pc3.fines.bc +  plot.pc3.fines.lc
-
-
-#Variation in Percent Fines for each eFishing Site starting with pc3.fines
-
-#Grab the eFishing sites
-pc3.efishing <- pc3.fines %>% 
-  filter(grepl('eFishing', Site)) #using grepl to select all sites with "efishing" in the name 
-
-#Tell r Sites will be in a specific order.
-pc3.efishing$Site <- factor(pc3.efishing$Site, levels = c("Dog eFishing","Upper Mainstem eFishing","Lower Mainstem eFishing","Big Creek Powerhouse eFishing","Big Creek eFishing", "Little Creek eFishing"),ordered = TRUE)
-
-#Scatterplot to see the variation (3 transects) in percent fines for each eFishing Site.
-ggplot(pc3.efishing, aes(x = Site, y = Percent_finer, color = Round)) +
-  geom_jitter(width = 0.1) +
-  scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
-                      expand = c(0,0)) +
-  scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
-  theme_classic() +
-  theme(legend.position = "top",
-        legend.title = element_blank())
-
-
-#STATS - TBD
-#Need to figure out if we are using t-tests or Chi-squared test for independance?
-#Before running the t tests we need to think about independance (repeated measures??. 
-
-#Mainstem
-pc3.fines.mainstem.r1 <-  pc3.fines.mainstem %>% 
-     filter(Round == 1) %>% #Round 1 data  
-     select(Percent_finer)
- 
-pc3.fines.mainstem.r2 <-  pc3.fines.mainstem %>% 
-     filter(Round == 2) %>% #Round 2 data
-     select(Percent_finer)
-
-# t.test( pc3.fines.mainstem.r1$Percent_finer,  pc3.fines.mainstem.r2$Percent_finer, alternative = "two.sided") #May need to adjust the alternative to "greater than".
-
-# Big Creek
-pc3.fines.bc.r1 <-  pc3.fines.bc %>% 
-     filter(Round == 1) %>% #Round 1 data  
-     select(Percent_finer)
- 
-pc3.fines.bc.r2 <-  pc3.fines.bc %>% 
-     filter(Round == 2) %>% #Round 2 data
-     select(Percent_finer)
-
-# t.test( pc3.fines.bc.r1$Percent_finer,  pc3.fines.bc.r2$Percent_finer, alternative = "two.sided") #May need to adjust the alternative to "greater than".
-
-#Little Creek
-pc3.fines.lc.r1 <-  pc3.fines.lc %>% 
-     filter(Round == 1) %>% #Round 1 data  
-     select(Percent_finer)
- 
-pc3.fines.lc.r2 <-  pc3.fines.lc %>% 
-     filter(Round == 2) %>% #Round 2 data
-     select(Percent_finer)
-
-# t.test( pc3.fines.lc.r1$Percent_finer,  pc3.fines.lc.r2$Percent_finer, alternative = "two.sided") #May need to adjust the alternative to "greater than".
-
-```
 
 **Sediment Distribution Plots**
 
@@ -522,81 +183,7 @@ Distribution plots can help answer the question, "Are the data symmetrically dis
 
 Before we can plot the distribution, the pebble count input data needs to be "expanded" from size class *totals* to *individual* pebble counts by duplicating rows of values. 
 
-```{r Expand count summaries to individual counts (pc4)}
-
-#The tidy package has the function "uncount" which is the opposite operation of "dplyr::count"
-
-pc4 <- pc %>% 
-  group_by(Site, Transect, Round)
-
-pc4.pebbles <- uncount(pc4, Category_total, .id = "id") %>% 
-  mutate(Pebble_mm = Size_class_mm) %>% #rename column to emphasize we are looking at individual pebbles now
-  select(!Size_class_mm) #remove column
-
-```
-
-
-```{r Calculate D50 for plotting (pc4)}
-
-#Goal: Calculate the median (by definition the D50) for each site, transect, and round
-
-pc4.d50 <- pc4.pebbles %>% 
-  summarise(d50 = median(Pebble_mm))
-
-ggplot(pc4.d50, aes( x = Site, y = d50, color = Round, shape = factor(Transect))) + 
-  geom_jitter(width = 0.1)
-
-#Looking at only eFishing Sites
-#Grab the eFishing sites
-pc4.efishing <- pc4.pebbles %>% 
-  filter(grepl('eFishing', Site)) #using grepl to select all sites with "efishing" in the name 
-
-#Tell r Sites will be in a specific order.
-pc4.efishing$Site <- factor(pc4.efishing$Site, levels = c("Dog eFishing","Upper Mainstem eFishing","Lower Mainstem eFishing","Big Creek Powerhouse eFishing","Big Creek eFishing", "Little Creek eFishing"),ordered = TRUE)
-
-pc4.d50.efish <- pc4.efishing %>% 
-  summarise(d50 = median(Pebble_mm))
-
-ggplot(pc4.d50.efish, aes( x = Site, y = d50, color = Round, shape = factor(Transect))) + 
-  geom_jitter(width = 0.1)
-
-#Looking longitudinally along the mainstem
-pc4.d50.mainstem <- pc4.pebbles %>% 
-  filter(Long_Station < 8) %>%  #mainstem stations
-  summarise(d50 = median(Pebble_mm))
-
-pc4.d50.mainstem$Site <- factor(pc4.d50.mainstem$Site, levels = c("Lower Mainstem eFishing", "PCX-1", "PCX-2", "PCX-4", "PCX-5", "Upper Mainstem eFishing", "Dog eFishing"),ordered = TRUE)
-
-ggplot(pc4.d50.mainstem, aes( x = Site, y = d50, color = Round, shape = factor(Transect))) +
-    geom_jitter(width = 0.1) +
-  scale_y_continuous(name = "D50", limits = c(0,64),
-                      expand = c(0,0)) +
-  scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
-  theme_classic() +
-  theme(legend.position = "bottom")
-```
-
-
-```{r Pebble distribution plots (pc4)}
-
-#Quick scatterplot to see the data points
-ggplot(pc4.pebbles, aes( x = Site, y = Pebble_mm, color = Round, shape = factor(Transect))) + 
-  geom_jitter()
-  
-
-#Violin plot - hard to see
-ggplot(pc4.pebbles, aes( x = Site, y = Pebble_mm, color = Round)) +
-  geom_violin()
-
-#Box plot 
-ggplot(pc4.pebbles, aes( x = Site, y = Pebble_mm, color = Round)) +
-  geom_boxplot()
-
-
-```
-
-
-
+![Mainstem D50](Figures/PC_d50_mainstem_20210406_9x3.jpg)
 
 
 **Find gransize at percentiles**
@@ -631,27 +218,27 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 #Call in what you want to calculate. In this case its the median grain size (D50) of the test dataset (one site). 
 
-calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
+# calculate_dx(50, pc.test$Size_class_mm, pc.test$Percent_finer)
 
 #Note, it will give you an error if the first category (i.e. <2mm) is greater than the percential you want to calculate.
 
 # calculate_dx(16, pc.test$Size_class_mm, pc.test$Percent_finer) #error generated becuase you want to calculate the D16 and <2mm is 40% of the sample.
 
 #Once we have this function set up, loop through D16, D50 and D84 for the one site.
-dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
-
-names(dxs) <- paste0('d', dxs)
-
-sapply(dxs, calculate_dx, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer)
+# dxs <- c(16, 50, 84) # choose which percentiles to calculate (e.g. D16, D50, D84)
+# 
+# names(dxs) <- paste0('d', dxs)
+# 
+# sapply(dxs, calculate_dx, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer)
 
 
 
 # Calculate summary stats for multiple transects all at once
 #Test dataset
-pc.test <- pc.test %>%
-  summarize(
-    d50 = calculate_dx(50, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
-    d84 = calculate_dx(84, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer))
+# pc.test <- pc.test %>%
+#   summarize(
+#     d50 = calculate_dx(50, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer),
+#     d84 = calculate_dx(84, size = pc.test$Size_class_mm, prcnt_finer = pc.test$Percent_finer))
 
 ####START HERE####
 #NOT WORKING FOR THE WHOLE DATASET!
@@ -666,9 +253,9 @@ pc.test <- pc.test %>%
 
 ```
 
-## Figure Output 
+## Final Figure Output 
 
 
-The <span style="color:purple">*Figure*</span> folder contains the figures used in the poster.
+The <span style="color:purple">*Figure*</span> folder contains the figures generated during data exploration *and* the final plots used in the poster. Below are the list of plots use din the poster:
 
 1.
