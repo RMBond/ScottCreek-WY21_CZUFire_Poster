@@ -1,22 +1,28 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-06 April, 2021
+07 April, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
   - [WQ Data](#wq-data)
   - [Hydrograph](#hydrograph)
   - [Pebble Counts](#pebble-counts)
+  - [eFishing Population Estimates](#efishing-population-estimates)
   - [Final Figure Output](#final-figure-output)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ## Introduction
 
-This is a space to keep track of the datasets used in the 2021 SRF
-poster. The goal is to visualize the “first flush” after the 2020 CZU
-Fire in the Scott Creek watershed (Santa Cruz, CA). Initially we plan to
-look at water quality and pebble count data.
+This readme file consists of an overview of the datasets, goals, and
+data visualizations used in the 2021 SRF poster. The goal is to
+visualize the “first flush” after the 2020 CZU Fire in the Scott Creek
+watershed (Santa Cruz, CA). Datasets include: water quality, hydrograph,
+pebble count, and eFishing. Each dataset has a unique scipt (.R file)
+where the data wrangling, analysis, and data visualization occurs. The
+“source” function has been included in this readme file to incorperate
+the individual scripts if desired (they are currently commented out for
+simplicity).
 
 <br>
 
@@ -37,7 +43,7 @@ datasets used in the poster.
 
 2.  The <span style="color:purple">*Gagedata\_XXX.csv*</span> datafile
     contains a portion of the stage(timestamp and ft) data. The unit is
-    installed near the Archibald Creek consluence with the mainstem.
+    installed near the Archibald Creek confluence with the mainstem.
     While we won’t be converting stage to discharge (we need a new
     rating curve), it will be helpful for visualizing the hyrograph and
     relate this to the WQ data. <span style="color:red">Unfortunately
@@ -52,6 +58,14 @@ datasets used in the poster.
     pebble count only transects) which were repeated twice (Autumn 2020
     & Winter 2021). AC and MA entered and QC’ed the data.
 
+4.  The <span style="color:purple">*Efishing\_20210407.csv*</span>
+    datafile contains 3 pass depletion eFsihing at the Lower mainstem,
+    Upper mainstem, and Big Creek “Sue” sites. Data were queried by JK
+    on 5 April 2021. Count of number of individuals caught for each
+    species and pass were generated using pivot tables. Note: eFishing
+    sampling events were limmited to August - November periods
+    (Additional June/July sampling events exists).
+
 ## Next Steps
 
 **WQ Dataset**
@@ -63,19 +77,33 @@ datasets used in the poster.
 3.  decide on the timeseries of intrest and continue to update WQ data
     csv file as needed.
 
+<br>
+
 **Pebble Count Dataset**
 
-1.  Generate pebble count summaries.
+1.  Generate pebble count summaries (D50).
+
+2.  Plot D50 (simmilar to percent fines boxplots).
+
+<br>
+
+**eFishing Dataset**
+
+1.  Generate population estimates and CI using FSA package.
+
+2.  Plot population estimates over time.
+
+<br>
 
 ## WQ Data
 
-Goal: Visualize WQ time-series during the “first flush”.
+**Goal**: Visualize WQ time-series during the “first flush”.
 
-Script: 1\_WQ\_Data.R
+**Script**: 1\_WQ\_Data.R
 
-Dataset name: wq
+**Dataset name**: wq
 
-Variable (column) description:
+**Variable (column) descriptions**:
 
   - Date = date
   - TS = Timestamp
@@ -86,6 +114,8 @@ Variable (column) description:
   - Sal\_ppt = Salinity \[parts per thousand\]
   - LDO\_mg\_l = Dissolved Oxygen \[mg/L\]
 
+<br>
+
 Here is the current plot using **RAW** data with all of the WQ variables
 (minus Salinity). We will need to “clean up” the data (e.g. remove/
 smooth data when the instrument was moved for downloading, etc.)
@@ -94,16 +124,18 @@ smooth data when the instrument was moved for downloading, etc.)
 
 ## Hydrograph
 
-Goal: Visualize Hydrograph time-series during the “first flush”. Note
-this data will *not* be presented in the poster.
+**Goal**: Visualize Hydrograph time-series during the “first flush”.
+Note this data will **not** be presented in the poster.
 
-Script: 2\_Hydrograph\_Data.R
+**Script**: 2\_Hydrograph\_Data.R
 
-Dataset name: gage
+**Dataset name**: gage
+
+<br>
 
 ## Pebble Counts
 
-Goals:
+**Goals**:
 
 1.  Visualize the sediment distributions at each site/transect. (Data
     needs to be manipulated from size class counts (summaries) to
@@ -124,9 +156,11 @@ Goals:
     CZU fire google drive [pebble count
     folder](https://drive.google.com/drive/u/1/folders/1MwYFVTyhN1_3NMqhlwIAu8DBYOm8KzSo).
 
-Dataset name = pc
+**Script**: 3\_Pebble\_Count\_Data.R
 
-Variable (column) description:
+**Dataset name**: pc
+
+**Variable descriptions**:
 
   - Date = Sample date (format = YYYY-MM-DD).
 
@@ -150,6 +184,8 @@ Variable (column) description:
   - Percent\_finer = Cumulative percent finer for each size class. This
     is used for calculating the Dx statistic.
 
+<br>
+
 **Cumulative percent finer plots for the eFishing sites**
 
 Each eFishing site plot: each panel (facet) is a transect and line color
@@ -167,7 +203,7 @@ pebbles less than 6 mm versus the number of pebbles greater than or
 equal to 6 mm) and the likelihood ratio Chi-square statistic to compare
 one frequency distribution with another (King and Potyondy, 1993).”
 
-![Cumulative percent finer plot](Figures/PC_20210406_5x4.jpg)
+![Cumulative percent finer plot](Figures/PC_20210406_5x4.jpg) <br>
 
 **Percent fines (\<6mm) and change in percent fines along the mainstem**
 
@@ -182,11 +218,13 @@ gotten more course.
 ![Percent fines along the mainstem
 plot](Figures/PC_percent_fines_mainstem_20210406_6x6.jpg)
 
+<br>
+
 **Boxplots and stat tests of percent surface fines (before and after
 “first flush”)**
 
 ![Percent fines
-Boxplot](Figures/PC_percent_fines_boxplot_20210406_6x3.jpg)
+Boxplot](Figures/PC_percent_fines_boxplot_20210406_6x3.jpg) <br>
 
 **Sediment Distribution Plots**
 
@@ -199,7 +237,7 @@ Before we can plot the distribution, the pebble count input data needs
 to be “expanded” from size class *totals* to *individual* pebble counts
 by duplicating rows of values.
 
-![Mainstem D50](Figures/PC_d50_mainstem_20210406_9x3.jpg)
+![Mainstem D50](Figures/PC_d50_mainstem_20210406_9x3.jpg) <br>
 
 **Find gransize at percentiles**
 
@@ -273,6 +311,41 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 #     d50 = calculate_dx(50, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer),
 #     d84 = calculate_dx(84, size = pc$Size_class_mm, prcnt_finer = pc$Percent_finer))
 ```
+
+<br>
+
+## eFishing Population Estimates
+
+**Goals**:
+
+1.  Generate population estimates and CI using FSA package (Simple
+    Fisheries Stock Assessment Methods package).
+
+2.  Plot population estimates over time.
+
+**Script**: 4\_eFishing\_Data.R
+
+**Dataset name**: fish
+
+**Variable descriptions**:
+
+  - ID = unique ID (for loop function)
+
+  - Date = Sample date (format = YYYY-MM-DD).
+
+  - Site = Site name
+
+  - Species = Coho or Steelhead
+
+  - P1 = Pass 1 count
+
+  - P2 = Pass 2 count
+
+  - P3 = Pass 3 count
+
+  - P4 = Pass 4 count (special case)
+
+<br>
 
 ## Final Figure Output
 
