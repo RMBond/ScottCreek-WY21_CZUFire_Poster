@@ -306,6 +306,12 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 * P4 = Pass 4 count (special case)
 
+* fire = True for 2020, False for all other years (used for color coding plots)
+
+<br>
+
+<!-- ![All years, all species](Figures/eFishing_everything_20210408.jpg) -->
+![Steelhead past 3 years of sampling](Figures/eFishing_20210408_4x3.jpg)
 
 ```{r eFishing code source, echo = FALSE}
 

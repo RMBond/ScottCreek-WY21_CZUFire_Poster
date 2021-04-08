@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-07 April, 2021
+08 April, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -344,6 +344,15 @@ calculate_dx <- function(dx, size, prcnt_finer) {
   - P3 = Pass 3 count
 
   - P4 = Pass 4 count (special case)
+
+  - fire = True for 2020, False for all other years (used for color
+    coding plots)
+
+<br>
+
+<!-- ![All years, all species](Figures/eFishing_everything_20210408.jpg) -->
+
+![Steelhead past 3 years of sampling](Figures/eFishing_20210408_4x3.jpg)
 
 <br>
 
