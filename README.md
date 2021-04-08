@@ -354,6 +354,9 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 ![Steelhead past 3 years of sampling](Figures/eFishing_20210408_4x3.jpg)
 
+![Bar Graph of steelhead past 3 years of
+sampling](Figures/eFishing_bar_20210408_3x5.jpg)
+
 <br>
 
 ## Final Figure Output

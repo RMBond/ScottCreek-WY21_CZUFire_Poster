@@ -159,13 +159,26 @@ fish.pop <- fish.pop.dat %>%
 #Check data structure
 str(fish.pop)
 
-#Start plotting
-
+#Start plotting all fish
 ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, color = Species, group = Site)) +
   geom_point() +
   geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI)) +
   facet_grid(Site ~.) +
   theme_classic()
+
+#BarPlot all fish
+ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, fill = Species, group = Species)) +
+  # geom_errorbar(aes(ymin = Pop_Estimate, ymax = X95_UCI, width = 0.5)) +
+  geom_col(position = "dodge") +
+  facet_grid(Site ~.) +
+  geom_vline(xintercept = 2019.5, linetype = "dashed") +
+  scale_x_continuous(name = "Year") +
+  scale_y_continuous(name = "Total abundance (# /100 m)") +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank())
+
+#____________________________________________________
 
 # Focusing on SH and the last 3 years of data
 fish.pop.sh <- fish.pop %>% 
@@ -195,4 +208,21 @@ ggplot(fish.pop.sh, aes(x = Year, y = Pop_Estimate, color = fire)) +
   # geom_text(data  = dat_text, mapping = aes(x = x, y = y, label = label), 
   #           inherit.aes = FALSE, size = 3.5)  #Add annotation to plot
 
-# ggsave("Figures/eFishing_20210408_4x3.jpg", width = 6, height = 6, units = "in", dpi = 650, device = "jpg")
+# ggsave("Figures/eFishing_20210408_6x6.jpg", width = 6, height = 6, units = "in", dpi = 650, device = "jpg")
+
+#BarPlot SH only
+
+ggplot(fish.pop.sh, aes(x = Year, y = Pop_Estimate, fill = fire)) +
+  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
+  geom_col() +
+  facet_grid(Site ~.) +
+  geom_vline(xintercept = 2019.5, linetype = "dashed") +
+  scale_x_continuous(name = "Year") +
+  scale_y_continuous(name = "Steelhead Abundance (# /100 m)") +
+  scale_fill_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) 
+
+# ggsave("Figures/eFishing_bar_20210408_3x5.jpg", width = 3, height = 5, units = "in", dpi = 650, device = "jpg")
+

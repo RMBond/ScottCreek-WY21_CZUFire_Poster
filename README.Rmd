@@ -313,6 +313,10 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 <!-- ![All years, all species](Figures/eFishing_everything_20210408.jpg) -->
 ![Steelhead past 3 years of sampling](Figures/eFishing_20210408_4x3.jpg)
 
+![Bar Graph of steelhead past 3 years of sampling](Figures/eFishing_bar_20210408_3x5.jpg)
+
+
+
 ```{r eFishing code source, echo = FALSE}
 
 #To run the eFishing script directly in this .rmd file use the function below
