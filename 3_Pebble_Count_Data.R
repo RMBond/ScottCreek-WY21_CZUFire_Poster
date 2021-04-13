@@ -202,11 +202,13 @@ pc3.fines.mainstem <- pc %>%
   filter(Long_Station < 8)
 
 plot.pc3.fines.mainstem <- ggplot(pc3.fines.mainstem, aes(x = Round, y = Percent_finer)) +
-  geom_boxplot(fill = c("#a6611a", "#018571")) +
+  geom_boxplot(fill = c("#011a27", "#e6df44")) +
   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
                      expand = c(0,0)) +
   theme_classic() +
+  theme(axis.text.x = element_blank(),
+        axis.title.y = element_blank()) +
   ggtitle("Scott Creek Mainstem (n=13)")
 
 #Boxplot of percent surface fines on Big Creek
@@ -215,12 +217,12 @@ pc3.fines.bc <- pc %>%
   filter(Long_Station > 7 & Long_Station < 11)
 
 plot.pc3.fines.bc <- ggplot(pc3.fines.bc, aes(x = Round, y = Percent_finer)) +
-  geom_boxplot(fill = c("#a6611a", "#018571")) +
+  geom_boxplot(fill = c("#011a27", "#e6df44")) +
   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
                      expand = c(0,0)) +
   theme_classic() +
-  theme(axis.title.y = element_blank()) +
+  theme(axis.text.x = element_blank(),) +
   ggtitle("Big Creek (n=7)")
 
 
@@ -230,7 +232,7 @@ pc3.fines.lc <- pc %>%
   filter(Long_Station == 11)
 
 plot.pc3.fines.lc <- ggplot(pc3.fines.lc, aes(x = Round, y = Percent_finer)) +
-  geom_boxplot(fill = c("#a6611a", "#018571")) +
+  geom_boxplot(fill = c("#011a27", "#e6df44")) +
   scale_x_discrete(name = "", limits = c("1","2"), labels = c("Before", "After")) +
   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
                      expand = c(0,0)) +
@@ -239,9 +241,9 @@ plot.pc3.fines.lc <- ggplot(pc3.fines.lc, aes(x = Round, y = Percent_finer)) +
   ggtitle("Little Creek (n=3)")
 
 #Put plots together using patchwork
-plot.pc3.fines.mainstem +  plot.pc3.fines.bc +  plot.pc3.fines.lc
+plot.pc3.fines.mainstem /  plot.pc3.fines.bc /  plot.pc3.fines.lc # portrait layout
 
-# ggsave("Figures/PC_percent_fines_boxplot_20210406_6x3.jpg", width = 6, height = 3, units = "in", dpi = 650, device = "jpg")
+# ggsave("Figures/PC_percent_fines_boxplot_20210413_3x6.jpg", width = 3, height = 6, units = "in", dpi = 650, device = "jpg")
 
 
 #Variation in Percent Fines for each eFishing Site starting with pc3.fines
