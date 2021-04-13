@@ -34,6 +34,13 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 4. The <span style="color:purple">*Efishing_20210407.csv*</span> datafile contains 3 pass depletion eFsihing at the Lower mainstem, Upper mainstem, and Big Creek "Sue" sites. Data were queried by JK on 5 April 2021. Count of number of individuals caught for each species and pass were generated using pivot tables. Note: eFishing sampling events were limmited to August - November periods (Additional June/July sampling events exists).
 
+<br>
+
+**Plot Theme Notes** 
+
+* The colors "#011a27" (dark blue) and "#e6df44" (yellow) are being used to data collected note before and after the fire, respectively.
+
+<br>
 
 ## Next Steps
 
@@ -99,7 +106,11 @@ Here is the current plot using **RAW** data with all of the WQ variables (minus 
 
 ![Raw WQ Plot](Figures/WQ_20210406_6x6.jpg)
 
+<br>
 
+Most recent plot cut to water height, turbidity, and **mean daily** pH.
+
+![Current WQ Plot](Figures/WQ_20210413_B_6x6.jpg)
 
 ```{r WQ Code source, echo = FALSE}
 
@@ -192,7 +203,7 @@ Panel B (Change in fines) - Start by summarising the % fines at each transect an
 
 **Boxplots and stat tests of percent surface fines (before and after "first flush")**
 
-![Percent fines Boxplot](Figures/PC_percent_fines_boxplot_20210406_6x3.jpg)
+![Percent fines Boxplot](Figures/PC_percent_fines_boxplot_20210413_3x6.jpg)
 <br>
 
 **Sediment Distribution Plots**

@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-08 April, 2021
+13 April, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -66,6 +66,15 @@ datasets used in the poster.
     sampling events were limmited to August - November periods
     (Additional June/July sampling events exists).
 
+<br>
+
+**Plot Theme Notes**
+
+  - The colors “\#011a27” (dark blue) and “\#e6df44” (yellow) are being
+    used to data collected note before and after the fire, respectively.
+
+<br>
+
 ## Next Steps
 
 **WQ Dataset**
@@ -121,6 +130,12 @@ Here is the current plot using **RAW** data with all of the WQ variables
 smooth data when the instrument was moved for downloading, etc.)
 
 ![Raw WQ Plot](Figures/WQ_20210406_6x6.jpg)
+
+<br>
+
+Most recent plot cut to water height, turbidity, and **mean daily** pH.
+
+![Current WQ Plot](Figures/WQ_20210413_B_6x6.jpg)
 
 ## Hydrograph
 
@@ -224,7 +239,7 @@ plot](Figures/PC_percent_fines_mainstem_20210406_6x6.jpg)
 “first flush”)**
 
 ![Percent fines
-Boxplot](Figures/PC_percent_fines_boxplot_20210406_6x3.jpg) <br>
+Boxplot](Figures/PC_percent_fines_boxplot_20210413_3x6.jpg) <br>
 
 **Sediment Distribution Plots**
 
