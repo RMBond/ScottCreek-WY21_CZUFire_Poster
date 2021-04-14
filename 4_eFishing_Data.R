@@ -278,3 +278,69 @@ ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
   theme_classic() +
   theme(legend.position = "bottom",
         legend.title = element_blank()) 
+
+#BarPlot TOTAL SALMONIDS - Landscpae layout
+# Goal: need to make three seperate plots and stick together to make the above 3 panel facet plot into landscape
+# starting with fish.pop.3y
+
+fish.pop.3y.US <- fish.pop.3y %>% 
+  filter(Site == "US eFishing")
+
+fish.pop.3y.BC <- fish.pop.3y %>% 
+  filter(Site == "BC eFishing")
+
+fish.pop.3y.LS <- fish.pop.3y %>% 
+  filter(Site == "LS eFishing")
+
+
+#BarPlot Upper Mainstem
+
+plot.UM <- ggplot(fish.pop.3y.US, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
+  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
+  geom_col() +
+  geom_vline(xintercept = 2019.5, linetype = "dashed") +
+  scale_x_continuous(name = "") +
+  scale_y_continuous(name = "Salmonid Abundance (# /100 m)", limits = c(0,300)) +
+  scale_fill_manual(values = c("#011a27", "#e6df44"), labels = c("Before", "After")) +
+  theme_classic() +
+  theme(legend.position = "none",
+        legend.title = element_blank()) +
+  ggtitle("Upper Mainstem")
+  
+
+#BarPlot Big Creek
+
+plot.BC <- ggplot(fish.pop.3y.BC, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
+  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
+  geom_col() +
+  geom_vline(xintercept = 2019.5, linetype = "dashed") +
+  scale_x_continuous(name = "") +
+  scale_y_continuous(name = "", limits = c(0,300)) +
+  scale_fill_manual(values = c("#011a27", "#e6df44"), labels = c("Before", "After")) +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) +
+  ggtitle("Big Creek")
+
+
+#BarPlot Lower Mainstem
+
+plot.LM <- ggplot(fish.pop.3y.LS, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
+  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
+  geom_col() +
+  geom_vline(xintercept = 2019.5, linetype = "dashed") +
+  scale_x_continuous(name = "") +
+  scale_y_continuous(name = "", limits = c(0,300)) +
+  scale_fill_manual(values = c("#011a27", "#e6df44"), labels = c("Before", "After")) +
+  theme_classic() +
+  theme(legend.position = "none",
+        legend.title = element_blank()) +
+  ggtitle("Lower Mainstem")
+
+#stich together
+plot.UM + plot.BC + plot.LM
+
+# ggsave("Figures/eFishing_totalbar_20210414_7x3.jpg", width = 7, height = 3, units = "in", dpi = 650, device = "jpg")
+
+#____________________________________________________
+

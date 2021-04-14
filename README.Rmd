@@ -28,7 +28,7 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 1. The <span style="color:purple">*Scott_Creek_Weir_Hydrolab_20210303.csv*</span> datafile contains a snippbet (incomplete dataset) of the water quality data collected by the HYDROLAB (S/N 66279, model DS5X). The unit is installed directly above the weir. It collects depth, temp, salinity, turbidity, (and other) every half hour. This file be updated as new downloads are completed up untill the time of the poster. Note there is some column renaming done before importing the dataset into r.
 
-2. The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek confluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. <span style="color:red">Unfortunately this file is missing WY20 data (specifically data between 12/4/19 and 12/4/20)and it's likely we will not be presenting this data. We can use the pressure data in the WQ dataset as a proxy.</span>
+2. The <span style="color:purple">*Precip_20210414.csv*</span> datafile contains a snippbet (incomplete dataset) of daily precipitation for Santa Cruz, CA from the [Weather Cat Website](http://www.weathercat.net/wxraindetail.php). Date range 1/1/21 to 3/1/21.
 
 3. The <span style="color:purple">*Scott_Creek_Pebble_20210319.csv*</span> datafile consists of pebble counts at 23 transects accrost the watershed (6 eFishing sites with 3 transects each, and 5 additional pebble count only transects) which were repeated twice (Autumn 2020 & Winter 2021). AC and MA entered and QC'ed the data. 
 
@@ -36,6 +36,9 @@ The <span style="color:purple">*Data*</span> folder contains the datasets used i
 
 5. The <span style="color:purple">*Efishing_totalpop_20210414.csv*</span> datafile is the FSA package output (population estimate, SD, and 95%CI) for each site. Note the FSA code below is repeated for 3 pass and 2 cases of 4 pass sampling. If you are intrested in seeing each species individually, use the <span style="color:purple">*Efishing_pop_20210407.csv*</span> datafile (contains estimates for each species using the same FSA method above). 
 
+Data not used:
+
+* The <span style="color:purple">*Gagedata_XXX.csv*</span> datafile contains a portion of the stage(timestamp and ft) data. The unit is installed near the Archibald Creek confluence with the mainstem. While we won't be converting stage to discharge (we need a new rating curve), it will be helpful for visualizing the hyrograph and relate this to the WQ data. <span style="color:red">Unfortunately this file is missing WY20 data (specifically data between 12/4/19 and 12/4/20)and it's likely we will not be presenting this data. We can use the pressure data in the WQ dataset as a proxy.</span>
 
 <br>
 
@@ -112,7 +115,7 @@ library(patchwork)
 Most recent plot cut to water height, turbidity, and **mean daily** pH.
 Data have been lightly QC'ed
 
-![Current WQ Plot](Figures/WQ_20210413_B_6x6.jpg)
+![Current WQ Plot + Precipitation](Figures/WQ_20210413_C_6x7.jpg)
 
 <br>
 
@@ -334,7 +337,11 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 <br>
 
-![Bar Graph of all salmonids past 3 years of sampling](Figures/eFishing_totalbar_20210414_3x5.jpg)
+![Bar Graph of all salmonids past 3 years of sampling (landscape)](Figures/eFishing_totalbar_20210414_7x3.jpg)
+
+<br>
+
+![Bar Graph of all salmonids past 3 years of sampling (portrait)](Figures/eFishing_totalbar_20210414_3x5.jpg)
 
 <br>
 

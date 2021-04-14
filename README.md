@@ -41,15 +41,11 @@ datasets used in the poster.
     poster. Note there is some column renaming done before importing the
     dataset into r.
 
-2.  The <span style="color:purple">*Gagedata\_XXX.csv*</span> datafile
-    contains a portion of the stage(timestamp and ft) data. The unit is
-    installed near the Archibald Creek confluence with the mainstem.
-    While we won’t be converting stage to discharge (we need a new
-    rating curve), it will be helpful for visualizing the hyrograph and
-    relate this to the WQ data. <span style="color:red">Unfortunately
-    this file is missing WY20 data (specifically data between 12/4/19
-    and 12/4/20)and it’s likely we will not be presenting this data. We
-    can use the pressure data in the WQ dataset as a proxy.</span>
+2.  The <span style="color:purple">*Precip\_20210414.csv*</span>
+    datafile contains a snippbet (incomplete dataset) of daily
+    precipitation for Santa Cruz, CA from the [Weather Cat
+    Website](http://www.weathercat.net/wxraindetail.php). Date range
+    1/1/21 to 3/1/21.
 
 3.  The
     <span style="color:purple">*Scott\_Creek\_Pebble\_20210319.csv*</span>
@@ -78,6 +74,18 @@ datasets used in the poster.
     <span style="color:purple">*Efishing\_pop\_20210407.csv*</span>
     datafile (contains estimates for each species using the same FSA
     method above).
+
+Data not used:
+
+  - The <span style="color:purple">*Gagedata\_XXX.csv*</span> datafile
+    contains a portion of the stage(timestamp and ft) data. The unit is
+    installed near the Archibald Creek confluence with the mainstem.
+    While we won’t be converting stage to discharge (we need a new
+    rating curve), it will be helpful for visualizing the hyrograph and
+    relate this to the WQ data. <span style="color:red">Unfortunately
+    this file is missing WY20 data (specifically data between 12/4/19
+    and 12/4/20)and it’s likely we will not be presenting this data. We
+    can use the pressure data in the WQ dataset as a proxy.</span>
 
 <br>
 
@@ -142,7 +150,7 @@ datasets used in the poster.
 Most recent plot cut to water height, turbidity, and **mean daily** pH.
 Data have been lightly QC’ed
 
-![Current WQ Plot](Figures/WQ_20210413_B_6x6.jpg)
+![Current WQ Plot + Precipitation](Figures/WQ_20210413_C_6x7.jpg)
 
 <br>
 
@@ -384,8 +392,13 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 <br>
 
-![Bar Graph of all salmonids past 3 years of
-sampling](Figures/eFishing_totalbar_20210414_3x5.jpg)
+![Bar Graph of all salmonids past 3 years of sampling
+(landscape)](Figures/eFishing_totalbar_20210414_7x3.jpg)
+
+<br>
+
+![Bar Graph of all salmonids past 3 years of sampling
+(portrait)](Figures/eFishing_totalbar_20210414_3x5.jpg)
 
 <br>
 
