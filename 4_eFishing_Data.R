@@ -19,7 +19,10 @@ library(patchwork)
 
 #1. Read in the data ####
 
-fish.dat <- read.csv("Data/eFishing_20210407.csv", sep = ",", header = T) #23 obs of 8 var. zeros for pass 4
+# fish.dat <- read.csv("Data/eFishing_20210407.csv", sep = ",", header = T) #23 obs of 8 var. BY SPECIES
+
+fish.dat <- read.csv("Data/eFishing_20210414.csv", sep = ",", header = T) #15 obs of 7 var. TOTAL SALMONIDS
+
 
 #2. Do some data wrangling ####
 
@@ -46,7 +49,9 @@ str(fish)
 
 #Starting with one sample - FOR 3 PASS
 #*3.1 number of fish captured during each pass ####
-ct <- unlist(fish.test[5:7])
+# ct <- unlist(fish.test[5:7]) #2 SPP
+
+ct <- unlist(fish.test[4:6]) #TOTAL FISH
 
 #*3.2 calculates number of passes ####
 k <- length(ct) 
@@ -61,10 +66,10 @@ confint(pr1)
 
 #4 PASS (2 samples)
 
-fish.test.6 <- fish.4p %>% 
-  filter(ID == 6)
+fish.test.3 <- fish.4p %>% 
+  filter(ID == 3)
 
-ct <- unlist(fish.test.6[5:8])
+ct <- unlist(fish.test.3[4:7])
 k <- length(ct) 
 Total <- sum(ct) 
 i <- seq(1,k)
@@ -73,10 +78,10 @@ pr1 <- removal(ct)
 summary(pr1)
 confint(pr1)
 
-fish.test.14 <- fish.4p %>% 
-  filter(ID == 14)
+fish.test.8 <- fish.4p %>% 
+  filter(ID == 8)
 
-ct <- unlist(fish.test.14[5:8])
+ct <- unlist(fish.test.8[4:7])
 k <- length(ct) 
 Total <- sum(ct) 
 i <- seq(1,k)
@@ -113,7 +118,7 @@ calculate_pop(fish.test)
 #       a dataframe. 
 
 for (i in 1:nrow(fish)) {
-  ct <- unlist(fish[i,5:7])
+  ct <- unlist(fish[i,4:6])
   k <- length(ct) 
   Total <- sum(ct) 
   i <- seq(1,k)
@@ -149,42 +154,46 @@ for (i in 1:nrow(fish)) {
 #4. Plot efishing depletion estimates ####
 
 #Read in population estimate file
-fish.pop.dat <- read.csv("Data/eFishing_pop_20210408.csv", sep = ",", header = T) #23 obs of 8 var. zeros for pass 4
+# fish.pop.dat <- read.csv("Data/eFishing_pop_20210408.csv", sep = ",", header = T) #23 obs of 8 var. BY SPECIES
+
+fish.pop.dat <- read.csv("Data/eFishing_totalpop_20210414.csv", sep = ",", header = T) #15 obs of 7 var. TOTAL SALMONIDS
+
 
 #Do some data wrangling
 fish.pop <- fish.pop.dat %>% 
   mutate(Date = mdy(Date)) %>% 
-  mutate(Year = year(Date)) #make a year column
+  mutate(Year = year(Date)) %>% #make a year column
+  mutate(Fire = ifelse(Year == 2020, T,F)) # make a column to note fire, used for color in ggplot
 
 #Check data structure
 str(fish.pop)
 
-#Start plotting all fish
-ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, color = Species, group = Site)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI)) +
-  facet_grid(Site ~.) +
-  theme_classic()
+# #Start plotting - 2 SPP
+# ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, color = Species, group = Site)) +
+#   geom_point() +
+#   geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI)) +
+#   facet_grid(Site ~.) +
+#   theme_classic()
 
-#BarPlot all fish
-ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, fill = Species, group = Species)) +
-  # geom_errorbar(aes(ymin = Pop_Estimate, ymax = X95_UCI, width = 0.5)) +
-  geom_col(position = "dodge") +
-  facet_grid(Site ~.) +
-  geom_vline(xintercept = 2019.5, linetype = "dashed") +
-  scale_x_continuous(name = "Year") +
-  scale_y_continuous(name = "Total abundance (# /100 m)") +
-  theme_classic() +
-  theme(legend.position = "bottom",
-        legend.title = element_blank())
+#BarPlot - 2 SPP
+# ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, fill = Species, group = Species)) +
+#   # geom_errorbar(aes(ymin = Pop_Estimate, ymax = X95_UCI, width = 0.5)) +
+#   geom_col(position = "dodge") +
+#   facet_grid(Site ~.) +
+#   geom_vline(xintercept = 2019.5, linetype = "dashed") +
+#   scale_x_continuous(name = "Year") +
+#   scale_y_continuous(name = "Total abundance (# /100 m)") +
+#   theme_classic() +
+#   theme(legend.position = "bottom",
+#         legend.title = element_blank())
 
 #____________________________________________________
 
 # Focusing on SH and the last 3 years of data
-fish.pop.sh <- fish.pop %>% 
-  filter(Species == "Steelhead") %>% 
-  filter(Year > 2017) %>% 
-  mutate(fire = ifelse(Year == 2020, T,F))
+# fish.pop.sh <- fish.pop %>% 
+#   filter(Species == "Steelhead") %>% 
+#   filter(Year > 2017) %>% 
+#   mutate(Fire = ifelse(Year == 2020, T,F))
 
 # #create facet labels
 # dat_text <- data.frame(
@@ -195,34 +204,77 @@ fish.pop.sh <- fish.pop %>%
 #   y     = c(290,290,290))
 
 
-ggplot(fish.pop.sh, aes(x = Year, y = Pop_Estimate, color = fire)) +
-  geom_point() +
-  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI)) +
-  facet_grid(Site ~.) +
-  scale_x_continuous(name = "Year") +
-  scale_y_continuous(name = "Population Estimate") +
-  scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
-  theme_classic() +
-  theme(legend.position = "bottom",
-        legend.title = element_blank()) 
-  # geom_text(data  = dat_text, mapping = aes(x = x, y = y, label = label), 
-  #           inherit.aes = FALSE, size = 3.5)  #Add annotation to plot
+# ggplot(fish.pop.sh, aes(x = Year, y = Pop_Estimate, color = Fire)) +
+#   geom_point() +
+#   geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI)) +
+#   facet_grid(Site ~.) +
+#   scale_x_continuous(name = "Year") +
+#   scale_y_continuous(name = "Population Estimate") +
+#   scale_color_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
+#   theme_classic() +
+#   theme(legend.position = "bottom",
+#         legend.title = element_blank()) 
+#   # geom_text(data  = dat_text, mapping = aes(x = x, y = y, label = label), 
+#   #           inherit.aes = FALSE, size = 3.5)  #Add annotation to plot
 
 # ggsave("Figures/eFishing_20210408_6x6.jpg", width = 6, height = 6, units = "in", dpi = 650, device = "jpg")
 
-#BarPlot SH only
+# #BarPlot SH only
+# 
+# ggplot(fish.pop.sh, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
+#   geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
+#   geom_col() +
+#   facet_grid(Site ~.) +
+#   geom_vline(xintercept = 2019.5, linetype = "dashed") +
+#   scale_x_continuous(name = "Year") +
+#   scale_y_continuous(name = "Steelhead Abundance (# /100 m)") +
+#   scale_fill_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
+#   theme_classic() +
+#   theme(legend.position = "bottom",
+#         legend.title = element_blank()) 
 
-ggplot(fish.pop.sh, aes(x = Year, y = Pop_Estimate, fill = fire)) +
+# ggsave("Figures/eFishing_bar_20210408_3x5.jpg", width = 3, height = 5, units = "in", dpi = 650, device = "jpg")
+
+#____________________________________________________
+
+
+# Focusing on last 3 years of data
+
+fish.pop.3y <- fish.pop %>%
+  filter(Year > 2017)
+
+
+#Code for odering facets
+
+fish.pop.3y$Site = factor(fish.pop.3y$Site,levels = c("US eFishing","BC eFishing","LS eFishing"),ordered = TRUE)
+
+
+#BarPlot TOTAL SALMONIDS
+
+ggplot(fish.pop.3y, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
   geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
   geom_col() +
   facet_grid(Site ~.) +
   geom_vline(xintercept = 2019.5, linetype = "dashed") +
   scale_x_continuous(name = "Year") +
-  scale_y_continuous(name = "Steelhead Abundance (# /100 m)") +
-  scale_fill_manual(values = c("#a6611a", "#018571"), labels = c("Before", "After")) +
+  scale_y_continuous(name = "Salmonid Abundance (# /100 m)") +
+  scale_fill_manual(values = c("#011a27", "#e6df44"), labels = c("Before", "After")) +
   theme_classic() +
   theme(legend.position = "bottom",
         legend.title = element_blank()) 
 
-# ggsave("Figures/eFishing_bar_20210408_3x5.jpg", width = 3, height = 5, units = "in", dpi = 650, device = "jpg")
 
+# ggsave("Figures/eFishing_totalbar_20210414_3x5.jpg", width = 3, height = 5, units = "in", dpi = 650, device = "jpg")
+
+#BarPlot TOTAL SALMONIDS - all years
+ggplot(fish.pop, aes(x = Year, y = Pop_Estimate, fill = Fire)) +
+  geom_errorbar(aes(ymin = X95_LCI, ymax = X95_UCI, width = 0.5)) +
+  geom_col() +
+  facet_grid(Site ~.) +
+  geom_vline(xintercept = 2019.5, linetype = "dashed") +
+  scale_x_continuous(name = "Year", breaks = seq(2013,2020,1)) +
+  scale_y_continuous(name = "Salmonid Abundance (# /100 m)") +
+  scale_fill_manual(values = c("#011a27", "#e6df44"), labels = c("Before", "After")) +
+  theme_classic() +
+  theme(legend.position = "bottom",
+        legend.title = element_blank()) 

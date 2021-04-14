@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-13 April, 2021
+14 April, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -58,20 +58,34 @@ datasets used in the poster.
     pebble count only transects) which were repeated twice (Autumn 2020
     & Winter 2021). AC and MA entered and QC’ed the data.
 
-4.  The <span style="color:purple">*Efishing\_20210407.csv*</span>
-    datafile contains 3 pass depletion eFsihing at the Lower mainstem,
+4.  The <span style="color:purple">*Efishing\_20210414.csv*</span>
+    datafile contains 3/4 pass depletion eFsihing at the Lower mainstem,
     Upper mainstem, and Big Creek “Sue” sites. Data were queried by JK
-    on 5 April 2021. Count of number of individuals caught for each
-    species and pass were generated using pivot tables. Note: eFishing
-    sampling events were limmited to August - November periods
-    (Additional June/July sampling events exists).
+    on 5 April 2021. Count of total number of individuals and pass were
+    generated using pivot tables. Note: eFishing sampling events were
+    limmited to August - November periods (Additional June/July sampling
+    events exists). If you are intrested in seeing each species
+    individually, use the
+    <span style="color:purple">*Efishing\_20210407.csv*</span> datafile
+    (contains counts for each species using the same method above).
+
+5.  The
+    <span style="color:purple">*Efishing\_totalpop\_20210414.csv*</span>
+    datafile is the FSA package output (population estimate, SD, and
+    95%CI) for each site. Note the FSA code below is repeated for 3 pass
+    and 2 cases of 4 pass sampling. If you are intrested in seeing each
+    species individually, use the
+    <span style="color:purple">*Efishing\_pop\_20210407.csv*</span>
+    datafile (contains estimates for each species using the same FSA
+    method above).
 
 <br>
 
 **Plot Theme Notes**
 
   - The colors “\#011a27” (dark blue) and “\#e6df44” (yellow) are being
-    used to data collected note before and after the fire, respectively.
+    used to designate data collected before and after the fire,
+    respectively.
 
 <br>
 
@@ -81,7 +95,7 @@ datasets used in the poster.
 
 1.  Decide on which WQ parameters to present,
 
-2.  clean up the raw data (i.e. remove spurious measurments), and
+2.  Clean up the raw data (i.e. remove spurious measurments), and
 
 3.  decide on the timeseries of intrest and continue to update WQ data
     csv file as needed.
@@ -92,7 +106,7 @@ datasets used in the poster.
 
 1.  Generate pebble count summaries (D50).
 
-2.  Plot D50 (simmilar to percent fines boxplots).
+2.  Plot D50 (simmilar to percent fines boxplots)??
 
 <br>
 
@@ -125,17 +139,18 @@ datasets used in the poster.
 
 <br>
 
-Here is the current plot using **RAW** data with all of the WQ variables
-(minus Salinity). We will need to “clean up” the data (e.g. remove/
-smooth data when the instrument was moved for downloading, etc.)
+Most recent plot cut to water height, turbidity, and **mean daily** pH.
+Data have been lightly QC’ed
 
-![Raw WQ Plot](Figures/WQ_20210406_6x6.jpg)
+![Current WQ Plot](Figures/WQ_20210413_B_6x6.jpg)
 
 <br>
 
-Most recent plot cut to water height, turbidity, and **mean daily** pH.
+**RAW** data with all of the WQ variables (minus Salinity). We will need
+to “clean up” the data (e.g. remove/ smooth data when the instrument was
+moved for downloading, etc.)
 
-![Current WQ Plot](Figures/WQ_20210413_B_6x6.jpg)
+![Raw WQ Plot](Figures/WQ_20210406_6x6.jpg)
 
 ## Hydrograph
 
@@ -218,9 +233,13 @@ pebbles less than 6 mm versus the number of pebbles greater than or
 equal to 6 mm) and the likelihood ratio Chi-square statistic to compare
 one frequency distribution with another (King and Potyondy, 1993).”
 
+Note: old colorway
+
 ![Cumulative percent finer plot](Figures/PC_20210406_5x4.jpg) <br>
 
 **Percent fines (\<6mm) and change in percent fines along the mainstem**
+
+Note: old colorway.
 
 Panel A (fines) - follows Potyondy and Hardy (1994) structure (% surface
 fines by longitude).
@@ -239,7 +258,7 @@ plot](Figures/PC_percent_fines_mainstem_20210406_6x6.jpg)
 “first flush”)**
 
 ![Percent fines
-Boxplot](Figures/PC_percent_fines_boxplot_20210413_3x6.jpg) <br>
+Boxplot](Figures/PC_percent_fines_boxplot_20210414_7x3.jpg) <br>
 
 **Sediment Distribution Plots**
 
@@ -365,12 +384,13 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 <br>
 
-<!-- ![All years, all species](Figures/eFishing_everything_20210408.jpg) -->
+![Bar Graph of all salmonids past 3 years of
+sampling](Figures/eFishing_totalbar_20210414_3x5.jpg)
 
-![Steelhead past 3 years of sampling](Figures/eFishing_20210408_4x3.jpg)
+<br>
 
-![Bar Graph of steelhead past 3 years of
-sampling](Figures/eFishing_bar_20210408_3x5.jpg)
+All Years ![Bar Graph of total salmonids all years of
+sampling](Figures/eFishing_totalbar_everything_20210414.jpeg)
 
 <br>
 

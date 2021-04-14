@@ -207,9 +207,10 @@ plot.pc3.fines.mainstem <- ggplot(pc3.fines.mainstem, aes(x = Round, y = Percent
   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
                      expand = c(0,0)) +
   theme_classic() +
-  theme(axis.text.x = element_blank(),
-        axis.title.y = element_blank()) +
-  ggtitle("Scott Creek Mainstem (n=13)")
+  # theme(axis.text.x = element_blank(), #use for portrait layout
+  #       axis.title.y = element_blank()) +
+  # ggtitle("Scott Creek Mainstem (n=13)")
+  ggtitle("Scott Creek Mainstem")
 
 #Boxplot of percent surface fines on Big Creek
 pc3.fines.bc <- pc %>% 
@@ -222,8 +223,10 @@ plot.pc3.fines.bc <- ggplot(pc3.fines.bc, aes(x = Round, y = Percent_finer)) +
   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
                      expand = c(0,0)) +
   theme_classic() +
-  theme(axis.text.x = element_blank(),) +
-  ggtitle("Big Creek (n=7)")
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  ggtitle("Big Creek")
+  # ggtitle("Big Creek (n=7)")
 
 
 #Boxplot of percent surface fines on Little Creek
@@ -237,11 +240,18 @@ plot.pc3.fines.lc <- ggplot(pc3.fines.lc, aes(x = Round, y = Percent_finer)) +
   scale_y_continuous(name = "Percent surface fines (<6mm)", limits = c(0,1),
                      expand = c(0,0)) +
   theme_classic() +
-  theme(axis.title.y = element_blank()) +
-  ggtitle("Little Creek (n=3)")
+  theme(axis.text.y = element_blank(),
+        axis.title.y = element_blank()) +
+  # ggtitle("Little Creek (n=3)")
+  ggtitle("Little Creek")
 
 #Put plots together using patchwork
-plot.pc3.fines.mainstem /  plot.pc3.fines.bc /  plot.pc3.fines.lc # portrait layout
+plot.pc3.fines.mainstem +  plot.pc3.fines.bc +  plot.pc3.fines.lc # Landscape layout
+
+# ggsave("Figures/PC_percent_fines_boxplot_20210414_7x3.jpg", width = 7, height = 3, units = "in", dpi = 650, device = "jpg")
+
+
+plot.pc3.fines.mainstem /  plot.pc3.fines.bc /  plot.pc3.fines.lc # Portrait layout
 
 # ggsave("Figures/PC_percent_fines_boxplot_20210413_3x6.jpg", width = 3, height = 6, units = "in", dpi = 650, device = "jpg")
 
