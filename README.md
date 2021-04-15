@@ -1,6 +1,6 @@
 Scott Creek CZU Fire 2021 SRF Poster Notes
 ================
-14 April, 2021
+15 April, 2021
 
   - [Introduction](#introduction)
   - [Next Steps](#next-steps)
@@ -150,7 +150,7 @@ Data not used:
 Most recent plot cut to water height, turbidity, and **mean daily** pH.
 Data have been lightly QC’ed
 
-![Current WQ Plot + Precipitation](Figures/WQ_20210413_C_6x7.jpg)
+![Current WQ Plot + Precipitation](Figures/WQ_20210415_6x7.jpg)
 
 <br>
 

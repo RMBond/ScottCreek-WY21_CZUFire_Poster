@@ -115,7 +115,7 @@ library(patchwork)
 Most recent plot cut to water height, turbidity, and **mean daily** pH.
 Data have been lightly QC'ed
 
-![Current WQ Plot + Precipitation](Figures/WQ_20210413_C_6x7.jpg)
+![Current WQ Plot + Precipitation](Figures/WQ_20210415_6x7.jpg)
 
 <br>
 

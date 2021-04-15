@@ -48,7 +48,7 @@ depth.plot <- ggplot(wq, aes(x = TS, y = Dep100_m)) +
   scale_x_datetime(name = "",
                    date_breaks = "1 week", date_labels = ("%b %d"),
                    limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "Stage [m]", limits = c(1.5, 3.5), expand = c(0,0)) +
+  scale_y_continuous(name = "Stage (m)", limits = c(1.5, 3.5), expand = c(0,0)) +
   theme_classic() +
   theme(axis.text.x = element_blank())
 
@@ -60,7 +60,7 @@ turb.plot <- ggplot(wq, aes(x = TS, y = TurbSC_NTU)) +
   scale_x_datetime(name = "",
                    date_breaks = "1 week", date_labels = ("%b %d"),
                    limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "Turbidity [NTU]", limits = c(0, 3000), expand = c(0,0)) +
+  scale_y_continuous(name = "Turbidity (NTU)", limits = c(0, 3000), expand = c(0,0)) +
   theme_classic() +
   theme(axis.text.x = element_blank())
 
@@ -186,7 +186,7 @@ precip.daily.plot <- ggplot(precip, aes(x = Date2, y = rain_cm)) +
   scale_x_datetime(name = "",
                    date_breaks = "1 week", date_labels = ("%b %d"),
                    limits = limits, expand = c(0,0)) +
-  scale_y_continuous(name = "Precipitation [cm]", limits = c(0, 8), expand = c(0,0)) +
+  scale_y_continuous(name = "Precipitation (cm)", limits = c(0, 8), expand = c(0,0)) +
   theme_classic() +
   theme() +
   theme(axis.text.x = element_blank())
@@ -194,4 +194,4 @@ precip.daily.plot <- ggplot(precip, aes(x = Date2, y = rain_cm)) +
 
 precip.daily.plot / depth.plot / turb.plot / pH.daily.plot
 
-# ggsave("Figures/WQ_20210413_C_6x7.jpg", width = 6, height = 7, units = "in", dpi = 650, device = "jpg")
+# ggsave("Figures/WQ_20210415_6x7.jpg", width = 6, height = 7, units = "in", dpi = 650, device = "jpg")
