@@ -1,28 +1,51 @@
-Scott Creek CZU Fire 2021 SRF Poster Notes
+Scott Creek CZU Fire 2021 SRF Poster
 ================
-15 April, 2021
+26 April, 2021
 
   - [Introduction](#introduction)
-  - [Next Steps](#next-steps)
+  - [Readme File Purpose](#readme-file-purpose)
+  - [Workflow Steps](#workflow-steps)
   - [WQ Data](#wq-data)
   - [Hydrograph](#hydrograph)
   - [Pebble Counts](#pebble-counts)
   - [eFishing Population Estimates](#efishing-population-estimates)
-  - [Final Figure Output](#final-figure-output)
+  - [Final Poster Output](#final-poster-output)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ## Introduction
 
+<img align="Right" width="300" height="300" src="Figures/CZU_perim_SCWatershed_crop_20210426.jpg">
+
+In August 2020, the CZU Lightning Complex fire burned more than 350 km2
+(86,500 acres) of coastal forests and hills in the Santa Cruz Mountains
+region (Red outline in right figure; Santa Cruz and San Mateo counties,
+California). Among the watersheds severely affected by wildfire was
+Scott Creek (Yellow outline in right figure), a small (70 km2) coastal
+basin \~80 km south of San Francisco Bay. The Scott Creek watershed is
+of special management concern as it supports the southernmost extant
+population of coho salmon (*Oncorhynchus kisutch*; Central California
+Coast \[CCC\] evolutionarily significant unit) in North America, as well
+as federally threatened CCC steelhead (anadramous *O. mykiss*). Scott
+Creek is also the location of a salmonid life cycle monitoring station
+operated jointly by NOAA’s Southwest Fisheries Science Center and the
+University of California, Santa Cruz. Extensive physical, chemical, and
+biological monitoring conducted throughout the Scott Creek watershed
+since 2002 provides a unique opportunity to rigorously examine the
+direct and indirect effects of wildfire on salmonid productivity and
+carrying capacity.
+
+## Readme File Purpose
+
 This readme file consists of an overview of the datasets, goals, and
-data visualizations used in the 2021 SRF poster. The goal is to
+data visualizations used in the 2021 SRF poster. The goal was to
 visualize the “first flush” after the 2020 CZU Fire in the Scott Creek
-watershed (Santa Cruz, CA). Datasets include: water quality, hydrograph,
-pebble count, and eFishing. Each dataset has a unique scipt (.R file)
-where the data wrangling, analysis, and data visualization occurs. The
-“source” function has been included in this readme file to incorperate
-the individual scripts if desired (they are currently commented out for
-simplicity).
+watershed (Santa Cruz, CA). Datasets include: water quality monitoring,
+water level (hydrograph), pebble count, and 3 pass depletion eFishing.
+Each dataset has a unique scipt (.R file) where the data wrangling,
+analysis, and data visualization occurs. The “source” function has been
+included in this readme file to incorperate the individual scripts if
+desired (they are currently commented out for simplicity).
 
 <br>
 
@@ -97,7 +120,7 @@ Data not used:
 
 <br>
 
-## Next Steps
+## Workflow Steps
 
 **WQ Dataset**
 
@@ -105,16 +128,16 @@ Data not used:
 
 2.  Clean up the raw data (i.e. remove spurious measurments), and
 
-3.  decide on the timeseries of intrest and continue to update WQ data
+3.  Decide on the timeseries of intrest and continue to update WQ data
     csv file as needed.
 
 <br>
 
 **Pebble Count Dataset**
 
-1.  Generate pebble count summaries (D50).
+1.  Generate pebble count summaries (% Fines, D50).
 
-2.  Plot D50 (simmilar to percent fines boxplots)??
+2.  Plot summaries (percent fines boxplots).
 
 <br>
 
@@ -397,20 +420,18 @@ calculate_dx <- function(dx, size, prcnt_finer) {
 
 <br>
 
-![Bar Graph of all salmonids past 3 years of sampling
-(portrait)](Figures/eFishing_totalbar_20210414_3x5.jpg)
-
-<br>
-
 All Years ![Bar Graph of total salmonids all years of
 sampling](Figures/eFishing_totalbar_everything_20210414.jpeg)
 
 <br>
 
-## Final Figure Output
+## Final Poster Output
 
-The <span style="color:purple">*Figure*</span> folder contains the
-figures generated during data exploration *and* the final plots used in
-the poster. Below are the list of plots use din the poster:
+The <span style="color:purple">*Final\_Poster*</span> folder contains
+the poster presented at the [SRF 2021 virtual
+conference](https://www.calsalmon.org/conferences/salmonid-restoration-virtual-conference)
+inlcuding the pptx file, pdf version, and jpeg file (shown below).
 
-1.
+<br>
+
+![Poster](Final_Poster/SRF_Fire&FirstFlush_poster_FINAL.jpg)
