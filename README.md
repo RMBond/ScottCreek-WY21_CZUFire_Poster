@@ -432,6 +432,4 @@ the poster presented at the [SRF 2021 virtual
 conference](https://www.calsalmon.org/conferences/salmonid-restoration-virtual-conference)
 inlcuding the pptx file, pdf version, and jpeg file (shown below).
 
-<br>
-
 ![Poster](Final_Poster/SRF_Fire&FirstFlush_poster_FINAL.jpg)
