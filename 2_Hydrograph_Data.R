@@ -19,7 +19,7 @@ options(scipen = 999)
 
 #1. Read in the data ####
 
-gage.dat <- read.csv("data/Gagedata_20210218.csv", h = T)#Flows up to 30 January 2021 6891 obs of 2 var.
+gage.dat <- read.csv("data/Gagedata_20210930.csv", h = T)#Flows up to 30 January 2021 6891 obs of 2 var.
 
 #2. Do some data wrangling ####
 
